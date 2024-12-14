@@ -12,4 +12,6 @@ void Bullet::Draw(SDL_Renderer *renderer) {
 }
 
 void Bullet::Update(uint32_t deltaTime) {
+    this->position.x += this->velocity.x * deltaTime;
+    this->position.y += this->velocity.y * deltaTime;
 }

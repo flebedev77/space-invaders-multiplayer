@@ -15,5 +15,6 @@ namespace config {
     namespace keys {
         bool left = 0;
         bool right = 0;
+        bool shoot = 0;
     };
 };
