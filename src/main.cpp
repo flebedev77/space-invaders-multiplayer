@@ -3,6 +3,8 @@
 #include <cmath>
 #include "game/config.h"
 #include "game/player.h"
+#include "game/block.h"
+#include "game/util.h"
 
 struct AppContext
 {
@@ -63,6 +65,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     config::player.position.y = (float)config::windowHeight - 20;
     config::player.position.x = (float)config::windowWidth / 2;
 
+    int amt_horizontal = config::windowWidth / config::blockWidth;
+    for (int i = 0; i < amt_horizontal; i++)
+    {
+        config::blocks.push_back(Block{
+            float(i) * config::blockWidth,
+            float(config::windowHeight - config::wallHeightFromFloor),
+            config::blockWidth, config::blockHeight,
+            config::blockMaxHealth});
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -90,7 +102,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         }
         if (event->key.key == SDLK_SPACE)
         {
-            //config::keys::shoot = down;
+            // config::keys::shoot = down;
             config::player.Shoot();
         }
     }
@@ -105,7 +117,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     config::prevTime = currentTicks;
 
     auto *app = (AppContext *)appstate;
-    SDL_Renderer* renderer = (*app).renderer;
+    SDL_Renderer *renderer = (*app).renderer;
 
     SDL_SetRenderDrawColor(renderer, config::backgroundColor.r, config::backgroundColor.g, config::backgroundColor.b, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
@@ -134,10 +146,53 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     for (size_t i = 0; i < config::player.bullets.size(); i++)
     {
-        Bullet& bullet = config::player.bullets.at(i);
+        Bullet &bullet = config::player.bullets.at(i);
 
         bullet.Update(config::deltaTime);
         bullet.Draw(renderer);
+
+        bool willDie = (bullet.position.y < -bullet.height);
+
+        if (!willDie)
+        {
+            for (size_t blockIndex = 0; blockIndex < config::blocks.size(); blockIndex++)
+            {
+                Block &block = config::blocks.at(blockIndex);
+                SDL_FRect blockRect{
+                    block.position.x,
+                    block.position.y,
+                    block.width,
+                    block.height};
+                SDL_FRect bulletRect{
+                    bullet.position.x,
+                    bullet.position.y,
+                    bullet.width,
+                    bullet.height};
+
+                if (utils::aabb(&blockRect, &bulletRect))
+                {
+                    willDie = true;
+                    block.health -= config::bulletDamage;
+                    if (block.health <= 0)
+                    {
+                        config::blocks.erase(config::blocks.begin() + blockIndex);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (willDie)
+        {
+            config::player.bullets.erase(config::player.bullets.begin() + i);
+        }
+    }
+
+    for (size_t i = 0; i < config::blocks.size(); i++)
+    {
+        Block &block = config::blocks.at(i);
+
+        block.Draw(renderer);
     }
 
     SDL_RenderPresent(app->renderer);

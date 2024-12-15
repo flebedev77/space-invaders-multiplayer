@@ -29,6 +29,9 @@ file(GLOB SOURCES "src/game/*.cpp")
 target_sources(${EXECUTABLE_NAME} 
 PRIVATE 
     src/main.cpp
+    src/game/block.cpp
+    src/game/util.cpp
+    src/game/alien.cpp
     ${SOURCES}
     src/iosLaunchScreen.storyboard
 )
