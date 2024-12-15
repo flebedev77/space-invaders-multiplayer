@@ -32,6 +32,7 @@ PRIVATE
     src/game/block.cpp
     src/game/util.cpp
     src/game/alien.cpp
+    src/game/images.cpp
     ${SOURCES}
     src/iosLaunchScreen.storyboard
 )

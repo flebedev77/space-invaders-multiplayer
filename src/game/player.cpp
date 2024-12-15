@@ -2,7 +2,8 @@
 
 void Player::Draw(SDL_Renderer *renderer)
 {
-    drawUtils::DrawCircle(renderer, this->position, this->radius);
+    //drawUtils::DrawCircle(renderer, this->position, this->radius);
+
 }
 
 void Player::Move(int direction, uint32_t deltaTime)
