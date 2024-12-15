@@ -1,16 +1,23 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include "util.h"
-#include "assets/alien.h"
-#include "assets/bullet.h"
-#include "assets/player.h"
 
-namespace images 
+namespace images
 {
-    SDL_Surface* alien;
-    SDL_Surface* bullet;
-    SDL_Surface* player;
+    extern SDL_Surface *alien_surface;
+    extern SDL_Surface *bullet_surface;
+    extern SDL_Surface *player_surface;
 
-    void LoadImages(SDL_Renderer* renderer);
+    extern SDL_FRect *alien_src_rect;
+    extern SDL_Texture *alien_texture;
+    extern float *alien_aspect;
+    extern SDL_FRect *bullet_src_rect;
+    extern SDL_Texture *bullet_texture;
+    extern float *bullet_aspect;
+    extern SDL_FRect *player_src_rect;
+    extern SDL_Texture *player_texture;
+    extern float *player_aspect;
+
+    void LoadImages(SDL_Renderer *renderer);
     void UnloadImages();
 };

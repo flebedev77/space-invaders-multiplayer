@@ -4,6 +4,7 @@
 #include "vector2.h"
 #include "bullet.h"
 #include "drawutils.h"
+#include "images.h"
 
 struct Player {
     Vector2 position{0, 0}; 
