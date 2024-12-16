@@ -160,7 +160,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     SDL_SetRenderDrawColor(renderer, 255, 4, 4, 255);
     SDL_RenderDebugText(renderer, config::windowWidth / 2 - 50, 10, "SPACE INVADERS");
-    config::player.Draw(renderer);
+    config::player.Draw(renderer, config::deltaTime);
 
     if (config::keys::left)
     {

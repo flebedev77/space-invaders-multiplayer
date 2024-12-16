@@ -2,7 +2,7 @@
 
 bool prevShotLeft = false;
 
-void Player::Draw(SDL_Renderer *renderer)
+void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
 {
     // drawUtils::DrawCircle(renderer, this->position, this->radius);
 
@@ -12,7 +12,21 @@ void Player::Draw(SDL_Renderer *renderer)
         this->radius * images::player_aspect,
         this->radius};
 
-    SDL_RenderTexture(renderer, images::player_texture, &images::player_src_rect, &rect);
+    SDL_Texture **tex;
+
+    tex = (this->selectedTexture) ? &images::player_texture : &images::playerf2_texture;
+
+    this->animationDelay += deltaTime;
+    if (this->animationDelay > this->animationRate)
+    {
+        this->animationDelay = 0;
+        this->selectedTexture = !this->selectedTexture;
+    }
+
+    if (tex != nullptr)
+    {
+        SDL_RenderTexture(renderer, *(tex), &images::player_src_rect, &rect);
+    }
 }
 
 void Player::Move(int direction, uint32_t deltaTime)
@@ -33,7 +47,7 @@ void Player::Shoot()
     //     this->position.y - 25.f};
 
     b.velocity.y = -0.3f;
-    //b2.velocity.y = -0.3f;
+    // b2.velocity.y = -0.3f;
     this->bullets.push_back(b);
-    //this->bullets.push_back(b2);
+    // this->bullets.push_back(b2);
 }

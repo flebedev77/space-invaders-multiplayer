@@ -23,11 +23,15 @@ struct Alien
     uint32_t shootDelay = 0;
     uint32_t shootRate = 3000;
 
+    uint32_t animationDelay = 0;
+    uint32_t animationRate = 250;
+    bool selectedSprite = 0;
+
     Alien(float x, float y, float w, float h): width(w), height(h) {
         position.x = x;
         position.y = y;
     } 
 
-    void Draw(SDL_Renderer* renderer);
+    void Draw(SDL_Renderer* renderer, uint32_t deltaTime);
     void Update_Shoot(SDL_Renderer* renderer, uint32_t deltaTime, std::vector<Block>& blocks, Player& player);
 };

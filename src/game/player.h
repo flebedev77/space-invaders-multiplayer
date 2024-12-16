@@ -17,12 +17,17 @@ struct Player {
     int health = 100;
     float playerSmoothHealth = 100.f;
 
+    uint32_t animationDelay = 400;
+    uint32_t animationRate = 600;
+
+    bool selectedTexture = 0;
+
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;
         position.y = pos.y;
     };
 
-    void Draw(SDL_Renderer* renderer);
+    void Draw(SDL_Renderer* renderer, uint32_t deltaTime);
     void Move(int dir, uint32_t deltaTime);
     void Shoot();
 };

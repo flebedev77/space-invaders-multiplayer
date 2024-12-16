@@ -1,6 +1,6 @@
 #include "alien.h"
 
-void Alien::Draw(SDL_Renderer *renderer)
+void Alien::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
 {
     SDL_FRect rect{
         this->position.x,
@@ -8,7 +8,18 @@ void Alien::Draw(SDL_Renderer *renderer)
         this->width,
         this->height};
 
-    SDL_RenderTexture(renderer, images::alien_texture, &images::alien_src_rect, &rect);
+    SDL_Texture** tex;
+
+    tex = (this->selectedSprite) ? &images::alien_texture : &images::alienf2_texture; 
+
+    this->animationDelay += deltaTime;
+    if (this->animationDelay > this->animationRate)
+    {
+        this->animationDelay = 0;
+        this->selectedSprite = !this->selectedSprite;
+    }
+
+    SDL_RenderTexture(renderer, *tex, &images::alien_src_rect, &rect);
 }
 
 void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector<Block> &blocks, Player &player)

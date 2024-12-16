@@ -38,7 +38,7 @@ namespace alienmgr
         {
             Alien &alien = aliens.at(i);
 
-            alien.Draw(renderer);
+            alien.Draw(renderer, deltaTime);
             alien.Update_Shoot(renderer, deltaTime, blocks, player);
 
             alien.position.x += float(alienDirection) * config::alienSpeed * deltaTime;
