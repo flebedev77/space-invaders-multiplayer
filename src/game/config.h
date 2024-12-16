@@ -22,6 +22,9 @@ namespace config {
     
     constexpr int bulletDamage = 25;
 
+    constexpr float healthbarHeight = 15.f;
+    constexpr float healthbarWidth = float(windowWidth);
+
     bool isGameOver = false;
     
     uint32_t prevTime = SDL_GetTicks();

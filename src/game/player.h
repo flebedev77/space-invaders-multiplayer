@@ -13,6 +13,10 @@ struct Player {
     float width, height;
     std::vector<Bullet> bullets;
 
+    int maxHealth = 100;
+    int health = 100;
+    float playerSmoothHealth = 100.f;
+
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;
         position.y = pos.y;

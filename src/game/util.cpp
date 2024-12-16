@@ -28,3 +28,8 @@ SDL_Surface *utils::loadEmbeddedBMP(SDL_Renderer *renderer, unsigned char bmp[],
 
     return surface;
 }
+
+float utils::lerp(float a, float b, float t)
+{
+    return a + (b - a) * t;
+}

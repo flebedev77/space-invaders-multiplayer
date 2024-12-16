@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include <vector>
+#include "player.h"
 #include "vector2.h"
 #include "bullet.h"
 #include "block.h"
@@ -28,5 +29,5 @@ struct Alien
     } 
 
     void Draw(SDL_Renderer* renderer);
-    void Update_Shoot(SDL_Renderer* renderer, uint32_t deltaTime, std::vector<Block>& blocks);
+    void Update_Shoot(SDL_Renderer* renderer, uint32_t deltaTime, std::vector<Block>& blocks, Player& player);
 };

@@ -234,9 +234,26 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         block.Draw(renderer);
     }
 
-    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime);
+    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player);
 
-    config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f));
+    config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f)) || (config::player.health <= 0);
+
+
+    //health bar
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_FRect healthBarRect{
+        0,
+        config::windowHeight - config::healthbarHeight,
+        config::healthbarWidth,
+        config::healthbarHeight
+    };
+    SDL_RenderFillRect(renderer, &healthBarRect);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
+    float realHealthValue = (float(config::player.playerSmoothHealth) / float(config::player.maxHealth)) * config::healthbarWidth;
+    healthBarRect.w = realHealthValue;
+    SDL_Log("%f", config::player.playerSmoothHealth);
+    SDL_RenderFillRect(renderer, &healthBarRect);
 
     if (config::isGameOver)
     {

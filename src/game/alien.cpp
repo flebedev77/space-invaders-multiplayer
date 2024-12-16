@@ -11,7 +11,7 @@ void Alien::Draw(SDL_Renderer *renderer)
     SDL_RenderTexture(renderer, images::alien_texture, &images::alien_src_rect, &rect);
 }
 
-void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector<Block> &blocks)
+void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector<Block> &blocks, Player &player)
 {
     this->shootDelay += deltaTime;
     if (this->shootDelay > this->shootRate)
@@ -34,8 +34,13 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
         bullet.Update(deltaTime);
         bullet.Draw(renderer);
 
-        std::vector<size_t> bulletIndexesToRemove;
-        std::vector<size_t> blockIndexesToRemove;
+        bool willDie = false;
+
+        SDL_FRect bullet_rect{
+            bullet.position.x,
+            bullet.position.y,
+            bullet.width,
+            bullet.height};
 
         for (size_t blockIndex = 0; blockIndex < blocks.size(); blockIndex++)
         {
@@ -47,17 +52,10 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
                 block.width,
                 block.height};
 
-            SDL_FRect bullet_rect{
-                bullet.position.x,
-                bullet.position.y,
-                bullet.width,
-                bullet.height};
-
             if (utils::aabb(&block_rect, &bullet_rect))
             {
                 block.health -= this->bulletDamage;
-
-                this->bullets.erase(this->bullets.begin() + i);
+                willDie = true;
 
                 if (block.health <= 0)
                 {
@@ -65,6 +63,28 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
                 }
                 break;
             }
+        }
+
+        if (!willDie)
+        {
+            SDL_FRect player_rect{
+                player.position.x - player.radius,
+                player.position.y - player.radius,
+                player.radius * images::player_aspect,
+                player.radius
+            };
+
+            if (utils::aabb(&bullet_rect, &player_rect))
+            {
+                willDie = true;
+
+                player.health -= this->bulletDamage;
+            }
+        }
+
+        if (willDie)
+        {
+            this->bullets.erase(this->bullets.begin() + i);
         }
     }
 }

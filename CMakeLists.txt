@@ -34,6 +34,7 @@ PRIVATE
     src/game/alien.cpp
     src/game/images.cpp
     src/game/alienmanager.cpp
+    src/game/particle.cpp
     ${SOURCES}
     src/iosLaunchScreen.storyboard
 )

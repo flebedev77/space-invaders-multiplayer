@@ -32,14 +32,14 @@ namespace alienmgr
         }
     }
 
-    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, std::vector<Block> &blocks, int windowWidth, uint32_t deltaTime)
+    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, std::vector<Block> &blocks, int windowWidth, uint32_t deltaTime, Player& player)
     {
         for (size_t i = 0; i < aliens.size(); i++)
         {
             Alien &alien = aliens.at(i);
 
             alien.Draw(renderer);
-            alien.Update_Shoot(renderer, deltaTime, blocks);
+            alien.Update_Shoot(renderer, deltaTime, blocks, player);
 
             alien.position.x += float(alienDirection) * config::alienSpeed * deltaTime;
         }
