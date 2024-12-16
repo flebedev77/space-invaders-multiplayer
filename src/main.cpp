@@ -76,7 +76,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     config::player.position.x = (float)config::windowWidth / 2;
 
     int amt_horizontal = config::windowWidth / config::blockWidth;
-    for (int j = 0; j < 2; j++)
+    for (int j = 0; j < 3; j++)
     {
         for (int i = 0; i < amt_horizontal; i++)
         {
@@ -125,6 +125,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
     if (event->type == SDL_EVENT_KEY_DOWN || event->type == SDL_EVENT_KEY_UP)
     {
+        config::hasStarted = true;
+
         bool down = (event->type == SDL_EVENT_KEY_DOWN);
         if (event->key.key == SDLK_A || event->key.key == SDLK_LEFT)
         {
@@ -279,7 +281,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         block.Draw(renderer, config::deltaTime);
     }
 
-    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player, config::alienMoveDownAmount);
+    if (config::hasStarted)
+    {
+        alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player, config::alienMoveDownAmount);
+    }
 
     if (config::aliens.size() == 0)
     {
@@ -296,7 +301,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     if (config::isSwitchingNextStage)
     {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDebugText(renderer, config::windowWidth/2 - 10, config::windowHeight/2, ("Stage " + std::to_string(config::stageNum)).c_str());
+        SDL_RenderDebugText(renderer, config::windowWidth / 2 - 10, config::windowHeight / 2, ("Stage " + std::to_string(config::stageNum)).c_str());
 
         config::switchingNextStageDelay += config::deltaTime;
         if (config::switchingNextStageDelay > config::switchingNextStageRate)
@@ -308,26 +313,29 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f)) || (config::player.health <= 0);
 
-    // health bar
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_FRect healthBarRect{
-        0,
-        config::windowHeight - config::healthbarHeight,
-        config::healthbarWidth,
-        config::healthbarHeight};
-    SDL_RenderFillRect(renderer, &healthBarRect);
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
-    float realHealthValue = (float(config::player.playerSmoothHealth) / float(config::player.maxHealth)) * config::healthbarWidth;
-    healthBarRect.w = realHealthValue;
-    SDL_RenderFillRect(renderer, &healthBarRect);
+    if (config::hasStarted)
+    {
+        // health bar
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_FRect healthBarRect{
+            0,
+            config::windowHeight - config::healthbarHeight,
+            config::healthbarWidth,
+            config::healthbarHeight};
+        SDL_RenderFillRect(renderer, &healthBarRect);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
+        float realHealthValue = (float(config::player.playerSmoothHealth) / float(config::player.maxHealth)) * config::healthbarWidth;
+        healthBarRect.w = realHealthValue;
+        SDL_RenderFillRect(renderer, &healthBarRect);
+    }
 
     if (config::isGameOver)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 50.f, float(config::windowHeight / 2), "GAME OVER!");
+        SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), "GAME OVER!");
     }
 
     SDL_RenderPresent(app->renderer);

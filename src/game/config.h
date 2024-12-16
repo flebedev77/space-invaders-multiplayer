@@ -33,6 +33,7 @@ namespace config {
     constexpr float healthbarHeight = 15.f;
     constexpr float healthbarWidth = float(windowWidth);
 
+    bool hasStarted = false;
     bool isGameOver = false;
     bool isSwitchingNextStage = false;
 
