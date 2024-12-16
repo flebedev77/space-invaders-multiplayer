@@ -3,6 +3,7 @@
 #include "color.h"
 #include "player.h"
 #include "block.h"
+#include "alien.h"
 
 namespace config {
     constexpr int windowWidth = 400;
@@ -11,16 +12,22 @@ namespace config {
 
     Player player = Player{};
     std::vector<Block> blocks;
+    std::vector<Alien> aliens;
 
-    constexpr float blockWidth = 20;
-    constexpr float blockHeight = 20;
+    constexpr float blockWidth = 20.f;
+    constexpr float blockHeight = 20.f;
+
     constexpr int blockMaxHealth = 100;
     constexpr int wallHeightFromFloor = 100;
 
+    
     constexpr int bulletDamage = 25;
     
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;
+
+    uint32_t shootDelay = 0;
+    uint32_t shootRate = 170; //170ms
 
     namespace keys {
         bool left = 0;

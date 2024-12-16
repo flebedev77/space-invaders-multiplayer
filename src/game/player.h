@@ -10,9 +10,10 @@ struct Player {
     Vector2 position{0, 0}; 
     float radius = 0.f;
     float speed = 0.5f;
+    float width, height;
     std::vector<Bullet> bullets;
 
-    Player(Vector2 pos = Vector2{}, float r = 10.f): position(Vector2{}), radius(r) {
+    Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;
         position.y = pos.y;
     };

@@ -33,6 +33,7 @@ PRIVATE
     src/game/util.cpp
     src/game/alien.cpp
     src/game/images.cpp
+    src/game/alienmanager.cpp
     ${SOURCES}
     src/iosLaunchScreen.storyboard
 )

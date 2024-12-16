@@ -2,10 +2,12 @@
 #include <SDL3/SDL_main.h>
 #include <cmath>
 #include "game/images.h"
-#include "game/config.h"
 #include "game/player.h"
 #include "game/block.h"
+#include "game/alienmanager.h"
+#include "game/alien.h"
 #include "game/util.h"
+#include "game/config.h"
 
 struct AppContext
 {
@@ -40,6 +42,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     {
         return SDL_Fail();
     }
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
     // print some information about the window
     SDL_ShowWindow(window);
@@ -78,6 +82,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     images::LoadImages(renderer);
 
+    alienmgr::SpawnAliens(4, 2, config::aliens);
+
     return SDL_APP_CONTINUE;
 }
 
@@ -106,8 +112,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         }
         if (event->key.key == SDLK_SPACE)
         {
-            // config::keys::shoot = down;
-            config::player.Shoot();
+            config::keys::shoot = down;
         }
     }
 
@@ -137,6 +142,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     if (config::keys::right)
     {
         config::player.Move(1, config::deltaTime);
+    }
+
+    config::shootDelay += config::deltaTime;
+    if (config::keys::shoot && config::shootDelay > config::shootRate)
+    {
+        config::shootDelay = 0;
+        config::player.Shoot();
     }
 
     if (config::player.position.x < config::player.radius)
@@ -198,6 +210,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
         block.Draw(renderer);
     }
+
+    alienmgr::UpdateAliens(renderer, config::aliens, config::windowWidth, config::deltaTime); 
 
     SDL_RenderPresent(app->renderer);
 

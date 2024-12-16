@@ -1,11 +1,11 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include "vector2.h"
+#include "images.h"
 
 struct Alien
 {
     Vector2 position{};
-    Vector2 velocity{1.f, 0.f};
     float width = 0.f; 
     float height = 0.f;
 
