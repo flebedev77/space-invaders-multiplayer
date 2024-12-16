@@ -133,6 +133,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         else if (config::isGameOver)
         {
             config::aliens.clear();
+            config::blocks.clear();
             config::player.health = config::player.maxHealth;
 
             // rebuild the wall
