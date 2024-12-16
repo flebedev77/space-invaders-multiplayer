@@ -130,6 +130,31 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             config::hasStarted = true;
             config::isSwitchingNextStage = true;
         }
+        else if (config::isGameOver)
+        {
+            config::aliens.clear();
+            config::player.health = config::player.maxHealth;
+
+            // rebuild the wall
+            int amt_horizontal = config::windowWidth / config::blockWidth;
+            for (int j = 0; j < 3; j++)
+            {
+                for (int i = 0; i < amt_horizontal; i++)
+                {
+                    srand(time(0) + i * 10);
+                    Block b{
+                        float(i) * config::blockWidth,
+                        float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
+                        config::blockWidth, config::blockHeight,
+                        config::blockMaxHealth, static_cast<uint32_t>(rand())};
+                    config::blocks.push_back(b);
+                }
+            }
+
+            config::alien_amt_h = 4;
+            config::alien_amt_v = 2;
+            alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
+        }
 
         bool down = (event->type == SDL_EVENT_KEY_DOWN);
         if (event->key.key == SDLK_A || event->key.key == SDLK_LEFT)
@@ -353,8 +378,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         {
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
+            int index2 = (config::menuScreenColorIndex + 1) % 5;
             SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
             SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), "GAME OVER!");
+            c = textColors[index2];
+            SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
+            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 120.f, float(config::windowHeight / 2) + 50.f, "PRESS ANY KEY TO PLAY AGAIN!!!");
         }
     }
 
