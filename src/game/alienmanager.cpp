@@ -25,19 +25,21 @@ namespace alienmgr
                     x * config::alienWidth * images::alien_aspect * config::alienPadding,
                     y * config::alienHeight * config::alienPadding,
                     config::alienWidth * images::alien_aspect, config::alienHeight};
-
+                srand(time(0) + ((x + y) * 1000));
+                a.shootDelay = rand() % (a.shootRate + 1);
                 aliens.push_back(a);
             }
         }
     }
 
-    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, int windowWidth, uint32_t deltaTime)
+    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, std::vector<Block> &blocks, int windowWidth, uint32_t deltaTime)
     {
         for (size_t i = 0; i < aliens.size(); i++)
         {
             Alien &alien = aliens.at(i);
 
             alien.Draw(renderer);
+            alien.Update_Shoot(renderer, deltaTime, blocks);
 
             alien.position.x += float(alienDirection) * config::alienSpeed * deltaTime;
         }

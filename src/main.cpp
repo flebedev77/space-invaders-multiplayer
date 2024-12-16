@@ -171,6 +171,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
         if (!willDie)
         {
+            SDL_FRect bulletRect{
+                bullet.position.x,
+                bullet.position.y,
+                bullet.width,
+                bullet.height};
             for (size_t blockIndex = 0; blockIndex < config::blocks.size(); blockIndex++)
             {
                 Block &block = config::blocks.at(blockIndex);
@@ -179,11 +184,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     block.position.y,
                     block.width,
                     block.height};
-                SDL_FRect bulletRect{
-                    bullet.position.x,
-                    bullet.position.y,
-                    bullet.width,
-                    bullet.height};
 
                 if (utils::aabb(&blockRect, &bulletRect))
                 {
@@ -192,6 +192,29 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     if (block.health <= 0)
                     {
                         config::blocks.erase(config::blocks.begin() + blockIndex);
+                    }
+                    break;
+                }
+            }
+
+            for (size_t alienIndex = 0; alienIndex < config::aliens.size(); alienIndex++)
+            {
+                Alien &alien = config::aliens.at(alienIndex);
+
+                SDL_FRect alienRect{
+                    alien.position.x,
+                    alien.position.y,
+                    alien.width,
+                    alien.height
+                };
+
+                if (utils::aabb(&bulletRect, &alienRect))
+                {
+                    willDie = true;
+                    alien.health -= config::bulletDamage;
+                    if (alien.health <= 0)
+                    {
+                        config::aliens.erase(config::aliens.begin() + alienIndex);
                     }
                     break;
                 }
@@ -211,7 +234,17 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         block.Draw(renderer);
     }
 
-    alienmgr::UpdateAliens(renderer, config::aliens, config::windowWidth, config::deltaTime); 
+    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime);
+
+    config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f));
+
+    if (config::isGameOver)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 50.f, float(config::windowHeight / 2), "GAME OVER!");
+    }
 
     SDL_RenderPresent(app->renderer);
 

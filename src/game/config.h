@@ -19,9 +19,10 @@ namespace config {
 
     constexpr int blockMaxHealth = 100;
     constexpr int wallHeightFromFloor = 100;
-
     
     constexpr int bulletDamage = 25;
+
+    bool isGameOver = false;
     
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;
