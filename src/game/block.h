@@ -10,13 +10,19 @@ struct Block
     float width = 0.f;
     float height = 0.f;
     int health = 100;
+    bool animated = true;
+    bool frame = 0;
 
-    Block(float x, float y, float w, float h, int blockHealth) : width(w), height(h)
+    uint32_t animationFrameDelay = 0;
+    uint32_t animationFrameRate = 500;
+
+    Block(float x, float y, float w, float h, int blockHealth, uint32_t animationDelay) : width(w), height(h)
     {
+        animationFrameDelay = animationDelay;
         health = blockHealth;
         position.x = x;
         position.y = y;
     }
 
-    void Draw(SDL_Renderer *renderer);
+    void Draw(SDL_Renderer *renderer, uint32_t deltaTime);
 };

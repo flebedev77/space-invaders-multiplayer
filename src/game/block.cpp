@@ -1,6 +1,6 @@
 #include "block.h"
 
-void Block::Draw(SDL_Renderer *renderer)
+void Block::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
 {
     SDL_FRect rect{
         this->position.x,
@@ -17,21 +17,35 @@ void Block::Draw(SDL_Renderer *renderer)
     if (health < 101)
     {
         tex = &images::zap1_texture;
+        this->animated = true;
     }
     if (health < 74)
     {
         blockHealthStatus = 1;
         tex = &images::zap1_texture;
+        this->animated = true;
     }
     if (health < 49)
     {
         blockHealthStatus = 2;
         tex = &images::zap2_texture;
+        this->animated = false;
     }
     if (health < 24)
     {
         blockHealthStatus = 3;
         tex = &images::zap3_texture;
+    }
+
+    if (this->animated)
+    {
+        this->animationFrameDelay += deltaTime;
+        if (this->animationFrameDelay > this->animationFrameRate)
+        {
+            this->animationFrameDelay = 0;
+            this->frame = !this->frame;
+        }
+        tex = (this->frame) ? &images::zap1_texture : &images::zap1f2_texture;
     }
 
     Color c = blockColors[blockHealthStatus];

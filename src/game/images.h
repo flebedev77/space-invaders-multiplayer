@@ -8,6 +8,7 @@ namespace images
     extern SDL_Surface *bullet_surface;
     extern SDL_Surface *player_surface;
     extern SDL_Surface *zap1_surface;
+    extern SDL_Surface *zap1f2_surface;
     extern SDL_Surface *zap2_surface;
     extern SDL_Surface *zap3_surface;
 
@@ -23,6 +24,7 @@ namespace images
 
     extern SDL_FRect zap_src_rect;
     extern SDL_Texture *zap1_texture;
+    extern SDL_Texture *zap1f2_texture;
     extern SDL_Texture *zap2_texture;
     extern SDL_Texture *zap3_texture;
 

@@ -19,6 +19,8 @@ struct AppContext
     SDL_AppResult app_quit = SDL_APP_CONTINUE;
 };
 
+void SpawnParticles(float x, float y, int amt, float r, float g, float b);
+
 SDL_AppResult SDL_Fail()
 {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Error %s", SDL_GetError());
@@ -76,11 +78,13 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     int amt_horizontal = config::windowWidth / config::blockWidth;
     for (int i = 0; i < amt_horizontal; i++)
     {
-        config::blocks.push_back(Block{
+        srand(time(0) + i * 10);
+        Block b{
             float(i) * config::blockWidth,
             float(config::windowHeight - config::wallHeightFromFloor),
             config::blockWidth, config::blockHeight,
-            config::blockMaxHealth});
+            config::blockMaxHealth, rand() };
+        config::blocks.push_back(b);
     }
 
     images::LoadImages(renderer);
@@ -150,7 +154,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     for (size_t i = 0; i < config::stars_amt; i++)
     {
-        Particle& p = config::stars[i];
+        Particle &p = config::stars[i];
         p.Draw(renderer);
     }
 
@@ -183,6 +187,19 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         config::player.position.x = config::windowWidth - config::player.radius;
     }
 
+    for (size_t i = 0; i < config::global_particles.size(); i++)
+    {
+        Particle &particle = config::global_particles.at(i);
+        particle.Draw(renderer);
+        particle.Update(config::deltaTime);
+
+        particle.lifetime += config::deltaTime;
+        if (particle.lifetime > particle.maxLifetime)
+        {
+            config::global_particles.erase(config::global_particles.begin() + i);
+        }
+    }
+
     for (size_t i = 0; i < config::player.bullets.size(); i++)
     {
         Bullet &bullet = config::player.bullets.at(i);
@@ -212,6 +229,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 {
                     willDie = true;
                     block.health -= config::bulletDamage;
+                    SpawnParticles(block.position.x, block.position.y, 5, 0.f, 0.f, 1.f);
                     if (block.health <= 0)
                     {
                         config::blocks.erase(config::blocks.begin() + blockIndex);
@@ -234,8 +252,10 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 {
                     willDie = true;
                     alien.health -= config::bulletDamage;
+                    SpawnParticles(alien.position.x, alien.position.y, 10, 0.5f, 0.f, 0.5f);
                     if (alien.health <= 0)
                     {
+                        SpawnParticles(alien.position.x, alien.position.y, 50, 1.f, 0.f, 1.f);
                         config::aliens.erase(config::aliens.begin() + alienIndex);
                     }
                     break;
@@ -253,7 +273,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     {
         Block &block = config::blocks.at(i);
 
-        block.Draw(renderer);
+        block.Draw(renderer, config::deltaTime);
     }
 
     alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player);
@@ -298,4 +318,22 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     }
 
     SDL_Log("Application quit successfully!");
+}
+
+void SpawnParticles(float x, float y, int amt, float r, float g, float b)
+{
+    for (int i = 0; i < amt; i++)
+    {
+        Particle p{
+            x,
+            y};
+        p.color.r = r;
+        p.color.g = g;
+        p.color.b = b;
+        srand(time(0) + i);
+        float deg = (float(rand()) / 1000.f);
+        p.velocity.x = SDL_cosf(deg) * 0.1f;
+        p.velocity.y = SDL_sinf(deg) * 0.1f;
+        config::global_particles.push_back(p);
+    }
 }

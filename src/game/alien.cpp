@@ -61,6 +61,7 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
                 block.health -= this->bulletDamage;
                 willDie = true;
 
+
                 if (block.health <= 0)
                 {
                     blocks.erase(blocks.begin() + blockIndex);

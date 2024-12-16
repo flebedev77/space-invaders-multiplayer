@@ -23,6 +23,21 @@ void Bullet::Update(uint32_t deltaTime) {
     me.position.x += me.velocity.x * deltaTime;
     me.position.y += me.velocity.y * deltaTime;
 
+    me.particleSpawnDelay += deltaTime;
+    if (me.particleSpawnDelay > me.particleSpawnRate)
+    {
+        me.particleSpawnDelay = 0;
+        Particle p{
+            me.position.x + 2.5f,
+            me.position.y
+        };
+        p.color.r = 1.f;
+        p.color.g = 0.f;
+        p.color.b = 0.f;
+        p.velocity.y = me.velocity.y / 2.f;
+        me.particles.push_back(p);
+    }
+
     for (size_t i = 0; i < me.particles.size(); i++)
     {
         Particle& particle = me.particles.at(i);

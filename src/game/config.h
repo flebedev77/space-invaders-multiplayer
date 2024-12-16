@@ -14,8 +14,10 @@ namespace config {
     Player player = Player{};
     std::vector<Block> blocks;
     std::vector<Alien> aliens;
+
     constexpr size_t stars_amt = 64;
     Particle stars[stars_amt];
+    std::vector<Particle> global_particles;
 
     constexpr float blockWidth = 20.f;
     constexpr float blockHeight = 20.f;

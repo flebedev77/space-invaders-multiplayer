@@ -19,6 +19,9 @@ struct Bullet
     float height;
     Color color;
 
+    uint32_t particleSpawnDelay = 0;
+    uint32_t particleSpawnRate = 100;
+
     std::vector<Particle> particles;
 
     Bullet(float x = 0, float y = 0) : position(Vector2{}),
@@ -30,7 +33,7 @@ struct Bullet
         position.x = x;
         position.y = y;
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 3; i++)
         {
             Particle p{
                 x,
@@ -39,7 +42,7 @@ struct Bullet
             p.color.g = 1.f;
             p.color.b = 1.f;
             srand(time(0) + i);
-            float deg = (float(rand()) / 100.f);
+            float deg = (float(rand()) * 1000.f);
             p.velocity.x = SDL_cosf(deg) * 0.1f;
             p.velocity.y = SDL_sinf(deg) * 0.1f;
             particles.push_back(p);

@@ -3,6 +3,7 @@
 #include "assets/bullet.h"
 #include "assets/player.h"
 #include "assets/zap1.h"
+#include "assets/zap1f2.h"
 #include "assets/zap2.h"
 #include "assets/zap3.h"
 
@@ -10,6 +11,7 @@ SDL_Surface *images::alien_surface = nullptr;
 SDL_Surface *images::bullet_surface = nullptr;
 SDL_Surface *images::player_surface = nullptr;
 SDL_Surface *images::zap1_surface = nullptr;
+SDL_Surface *images::zap1f2_surface = nullptr;
 SDL_Surface *images::zap2_surface = nullptr;
 SDL_Surface *images::zap3_surface = nullptr;
 
@@ -17,6 +19,7 @@ SDL_Texture *images::alien_texture = nullptr;
 SDL_Texture *images::bullet_texture = nullptr;
 SDL_Texture *images::player_texture = nullptr;
 SDL_Texture *images::zap1_texture = nullptr;
+SDL_Texture *images::zap1f2_texture = nullptr;
 SDL_Texture *images::zap2_texture = nullptr;
 SDL_Texture *images::zap3_texture = nullptr;
 
@@ -36,6 +39,7 @@ void images::LoadImages(SDL_Renderer *renderer)
     images::bullet_surface = utils::loadEmbeddedBMP(renderer, bullet_bmp, bullet_bmp_len);
     images::player_surface = utils::loadEmbeddedBMP(renderer, player_bmp, player_bmp_len);
     images::zap1_surface = utils::loadEmbeddedBMP(renderer, zap1_bmp, zap1_bmp_len);
+    images::zap1f2_surface = utils::loadEmbeddedBMP(renderer, zap1f2_bmp, zap1f2_bmp_len);
     images::zap2_surface = utils::loadEmbeddedBMP(renderer, zap2_bmp, zap2_bmp_len);
     images::zap3_surface = utils::loadEmbeddedBMP(renderer, zap3_bmp, zap3_bmp_len);
 
@@ -44,6 +48,7 @@ void images::LoadImages(SDL_Renderer *renderer)
     images::bullet_texture = SDL_CreateTextureFromSurface(renderer, images::bullet_surface);
     images::player_texture = SDL_CreateTextureFromSurface(renderer, images::player_surface);
     images::zap1_texture = SDL_CreateTextureFromSurface(renderer, images::zap1_surface);
+    images::zap1f2_texture = SDL_CreateTextureFromSurface(renderer, images::zap1f2_surface);
     images::zap2_texture = SDL_CreateTextureFromSurface(renderer, images::zap2_surface);
     images::zap3_texture = SDL_CreateTextureFromSurface(renderer, images::zap3_surface);
 
@@ -75,6 +80,7 @@ void images::UnloadImages()
     SDL_DestroySurface(images::bullet_surface);
     SDL_DestroySurface(images::player_surface);
     SDL_DestroySurface(images::zap1_surface);
+    SDL_DestroySurface(images::zap1f2_surface);
     SDL_DestroySurface(images::zap2_surface);
     SDL_DestroySurface(images::zap3_surface);
 
@@ -82,6 +88,7 @@ void images::UnloadImages()
     SDL_DestroyTexture(images::bullet_texture);
     SDL_DestroyTexture(images::player_texture);
     SDL_DestroyTexture(images::zap1_texture);
+    SDL_DestroyTexture(images::zap1f2_texture);
     SDL_DestroyTexture(images::zap2_texture);
     SDL_DestroyTexture(images::zap3_texture);
 }
