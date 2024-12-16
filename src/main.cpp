@@ -76,20 +76,23 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     config::player.position.x = (float)config::windowWidth / 2;
 
     int amt_horizontal = config::windowWidth / config::blockWidth;
-    for (int i = 0; i < amt_horizontal; i++)
+    for (int j = 0; j < 2; j++)
     {
-        srand(time(0) + i * 10);
-        Block b{
-            float(i) * config::blockWidth,
-            float(config::windowHeight - config::wallHeightFromFloor),
-            config::blockWidth, config::blockHeight,
-            config::blockMaxHealth, rand() };
-        config::blocks.push_back(b);
+        for (int i = 0; i < amt_horizontal; i++)
+        {
+            srand(time(0) + i * 10);
+            Block b{
+                float(i) * config::blockWidth,
+                float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
+                config::blockWidth, config::blockHeight,
+                config::blockMaxHealth, static_cast<uint32_t>(rand())};
+            config::blocks.push_back(b);
+        }
     }
 
     images::LoadImages(renderer);
 
-    alienmgr::SpawnAliens(4, 2, config::aliens);
+    alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
 
     for (size_t i = 0; i < config::stars_amt; i++)
     {
@@ -276,7 +279,32 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         block.Draw(renderer, config::deltaTime);
     }
 
-    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player);
+    alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player, config::alienMoveDownAmount);
+
+    if (config::aliens.size() == 0)
+    {
+        config::isSwitchingNextStage = true;
+        if (config::alien_amt_h < 10)
+        {
+            config::alien_amt_h++;
+        }
+        config::alien_amt_v++;
+        config::stageNum++;
+        alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
+    }
+
+    if (config::isSwitchingNextStage)
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDebugText(renderer, config::windowWidth/2 - 10, config::windowHeight/2, ("Stage " + std::to_string(config::stageNum)).c_str());
+
+        config::switchingNextStageDelay += config::deltaTime;
+        if (config::switchingNextStageDelay > config::switchingNextStageRate)
+        {
+            config::switchingNextStageDelay = 0;
+            config::isSwitchingNextStage = false;
+        }
+    }
 
     config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f)) || (config::player.health <= 0);
 

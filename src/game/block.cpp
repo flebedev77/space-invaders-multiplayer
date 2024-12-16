@@ -22,13 +22,13 @@ void Block::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
     if (health < 74)
     {
         blockHealthStatus = 1;
-        tex = &images::zap1_texture;
-        this->animated = true;
+        tex = &images::zap2_texture;
+        this->animated = false;
     }
     if (health < 49)
     {
         blockHealthStatus = 2;
-        tex = &images::zap2_texture;
+        tex = &images::zap3_texture;
         this->animated = false;
     }
     if (health < 24)

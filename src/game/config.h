@@ -14,6 +14,9 @@ namespace config {
     Player player = Player{};
     std::vector<Block> blocks;
     std::vector<Alien> aliens;
+    int alien_amt_h = 3;
+    int alien_amt_v = 2;
+    float alienMoveDownAmount = 4.f;
 
     constexpr size_t stars_amt = 64;
     Particle stars[stars_amt];
@@ -31,6 +34,11 @@ namespace config {
     constexpr float healthbarWidth = float(windowWidth);
 
     bool isGameOver = false;
+    bool isSwitchingNextStage = false;
+
+    uint8_t stageNum = 1;
+    uint32_t switchingNextStageDelay = 0;
+    uint32_t switchingNextStageRate = 1500;
     
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;

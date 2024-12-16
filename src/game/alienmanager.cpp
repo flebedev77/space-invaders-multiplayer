@@ -11,7 +11,7 @@ namespace alienmgr
         constexpr float moveDownAmount = 3.f;
     };
 
-    void MoveDown(std::vector<Alien> &aliens);
+    void MoveDown(std::vector<Alien> &aliens, float moveDownAmount);
 
     int alienDirection = 1;
 
@@ -32,7 +32,7 @@ namespace alienmgr
         }
     }
 
-    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, std::vector<Block> &blocks, int windowWidth, uint32_t deltaTime, Player& player)
+    void UpdateAliens(SDL_Renderer *renderer, std::vector<Alien> &aliens, std::vector<Block> &blocks, int windowWidth, uint32_t deltaTime, Player& player, float moveDownAmount)
     {
         for (size_t i = 0; i < aliens.size(); i++)
         {
@@ -50,25 +50,25 @@ namespace alienmgr
             if (alien.position.x + alien.width > float(windowWidth))
             {
                 alienDirection = -1;
-                MoveDown(aliens);
+                MoveDown(aliens, moveDownAmount);
                 break;
             }
             else if (alien.position.x < 0.f)
             {
                 alienDirection = 1;
-                MoveDown(aliens);
+                MoveDown(aliens, moveDownAmount);
                 break;
             }
         }
     }
 
-    void MoveDown(std::vector<Alien> &aliens)
+    void MoveDown(std::vector<Alien> &aliens, float moveDownAmount)
     {
         for (size_t i = 0; i < aliens.size(); i++)
         {
             Alien &alien = aliens.at(i);
 
-            alien.position.y += config::moveDownAmount;
+            alien.position.y += moveDownAmount;
         }
     }
 };
