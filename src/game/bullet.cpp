@@ -7,9 +7,9 @@ void Bullet::Draw(SDL_Renderer *renderer) {
         this->width,
         this->height
     };
-
-    //SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderTexture(renderer, images::bullet_texture, &images::bullet_src_rect, &rect);
+    SDL_SetRenderDrawColorFloat(renderer, this->color.r, this->color.g, this->color.b, 1.f);
+    SDL_RenderFillRect(renderer, &rect);
+    //SDL_RenderTexture(renderer, images::bullet_texture, &images::bullet_src_rect, &rect);
 }
 
 void Bullet::Update(uint32_t deltaTime) {

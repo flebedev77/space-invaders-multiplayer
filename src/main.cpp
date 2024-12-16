@@ -252,7 +252,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
     float realHealthValue = (float(config::player.playerSmoothHealth) / float(config::player.maxHealth)) * config::healthbarWidth;
     healthBarRect.w = realHealthValue;
-    SDL_Log("%f", config::player.playerSmoothHealth);
     SDL_RenderFillRect(renderer, &healthBarRect);
 
     if (config::isGameOver)

@@ -13,12 +13,22 @@ void Block::Draw(SDL_Renderer* renderer)
     int health = this->health;
     int blockHealthStatus = 0;
 
-    if (health < 74) blockHealthStatus = 1;
-    if (health < 49) blockHealthStatus = 2;
-    if (health < 24) blockHealthStatus = 3;
+    if (health < 74) 
+    {
+        blockHealthStatus = 1;
+    }
+    if (health < 49) 
+    {
+        blockHealthStatus = 2;
+    }
+    if (health < 24) 
+    {
+        blockHealthStatus = 3;
+    }
     
     Color c = blockColors[blockHealthStatus];
     SDL_SetRenderDrawColorFloat(renderer, c.r, c.g, c.b, 0.f);
 
-    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderTexture(renderer, images::zap1_texture, )
+    //SDL_RenderFillRect(renderer, &rect);
 }

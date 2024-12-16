@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include "vector2.h"
 #include "color.h"
+#include "images.h"
 
 struct Block
 {

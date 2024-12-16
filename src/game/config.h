@@ -31,7 +31,7 @@ namespace config {
     uint32_t deltaTime = 0;
 
     uint32_t shootDelay = 0;
-    uint32_t shootRate = 170; //170ms
+    uint32_t shootRate = 70; //170ms
 
     namespace keys {
         bool left = 0;

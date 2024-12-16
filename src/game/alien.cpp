@@ -22,6 +22,10 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
             this->position.x,
             this->position.y};
 
+        b.color.r = 0.5f;
+        b.color.g = 0.f;
+        b.color.b = 0.5f;
+
         b.velocity.y = 0.3f;
 
         this->bullets.push_back(b);
