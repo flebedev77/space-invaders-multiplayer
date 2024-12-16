@@ -4,6 +4,7 @@
 #include "player.h"
 #include "block.h"
 #include "alien.h"
+#include "particle.h"
 
 namespace config {
     constexpr int windowWidth = 400;
@@ -13,6 +14,8 @@ namespace config {
     Player player = Player{};
     std::vector<Block> blocks;
     std::vector<Alien> aliens;
+    constexpr size_t stars_amt = 64;
+    Particle stars[stars_amt];
 
     constexpr float blockWidth = 20.f;
     constexpr float blockHeight = 20.f;

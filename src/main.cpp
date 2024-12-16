@@ -1,6 +1,9 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <cmath>
+#include <ctime>
+#include <random>
+#include <cstdlib>
 #include "game/images.h"
 #include "game/player.h"
 #include "game/block.h"
@@ -84,6 +87,20 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     alienmgr::SpawnAliens(4, 2, config::aliens);
 
+    for (size_t i = 0; i < config::stars_amt; i++)
+    {
+        srand(time(0) + i * 100);
+        float starx = float(rand() % config::windowWidth);
+        srand(time(0) + i * 120);
+        float stary = float(rand() % config::windowHeight);
+
+        config::stars[i].position.x = starx;
+        config::stars[i].position.y = stary;
+        config::stars[i].color.r = 1.f;
+        config::stars[i].color.g = 1.f;
+        config::stars[i].color.b = 1.f;
+    }
+
     return SDL_APP_CONTINUE;
 }
 
@@ -130,6 +147,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     SDL_SetRenderDrawColor(renderer, config::backgroundColor.r, config::backgroundColor.g, config::backgroundColor.b, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
+
+    for (size_t i = 0; i < config::stars_amt; i++)
+    {
+        Particle& p = config::stars[i];
+        p.Draw(renderer);
+    }
 
     SDL_SetRenderDrawColor(renderer, 255, 4, 4, 255);
     SDL_RenderDebugText(renderer, config::windowWidth / 2 - 50, 10, "SPACE INVADERS");
@@ -205,8 +228,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     alien.position.x,
                     alien.position.y,
                     alien.width,
-                    alien.height
-                };
+                    alien.height};
 
                 if (utils::aabb(&bulletRect, &alienRect))
                 {
@@ -238,15 +260,13 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f)) || (config::player.health <= 0);
 
-
-    //health bar
+    // health bar
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_FRect healthBarRect{
         0,
         config::windowHeight - config::healthbarHeight,
         config::healthbarWidth,
-        config::healthbarHeight
-    };
+        config::healthbarHeight};
     SDL_RenderFillRect(renderer, &healthBarRect);
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
