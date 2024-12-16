@@ -6,7 +6,8 @@
 #include "alien.h"
 #include "particle.h"
 
-namespace config {
+namespace config
+{
     constexpr int windowWidth = 400;
     constexpr int windowHeight = 500;
     Color backgroundColor{30.f, 30.f, 30.f};
@@ -27,7 +28,7 @@ namespace config {
 
     constexpr int blockMaxHealth = 100;
     constexpr int wallHeightFromFloor = 100;
-    
+
     constexpr int bulletDamage = 25;
 
     constexpr float healthbarHeight = 15.f;
@@ -40,14 +41,19 @@ namespace config {
     uint8_t stageNum = 1;
     uint32_t switchingNextStageDelay = 0;
     uint32_t switchingNextStageRate = 1500;
-    
+
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;
 
     uint32_t shootDelay = 0;
-    uint32_t shootRate = 70; //170ms
+    uint32_t shootRate = 70; // 170ms
 
-    namespace keys {
+    int menuScreenColorIndex = 0;
+    uint32_t menuScreenColorChangeDelay = 0;
+    uint32_t menuScreenColorChangeRate = 1000;
+
+    namespace keys
+    {
         bool left = 0;
         bool right = 0;
         bool shoot = 0;

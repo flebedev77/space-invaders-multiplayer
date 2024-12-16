@@ -33,5 +33,5 @@ struct Alien
     } 
 
     void Draw(SDL_Renderer* renderer, uint32_t deltaTime);
-    void Update_Shoot(SDL_Renderer* renderer, uint32_t deltaTime, std::vector<Block>& blocks, Player& player);
+    void Update_Shoot(SDL_Renderer* renderer, uint32_t deltaTime, std::vector<Block>& blocks, Player& player, int windowHeight);
 };

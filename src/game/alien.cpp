@@ -22,7 +22,7 @@ void Alien::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
     SDL_RenderTexture(renderer, *tex, &images::alien_src_rect, &rect);
 }
 
-void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector<Block> &blocks, Player &player)
+void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector<Block> &blocks, Player &player, int windowHeight)
 {
     this->shootDelay += deltaTime;
     if (this->shootDelay > this->shootRate)
@@ -56,6 +56,8 @@ void Alien::Update_Shoot(SDL_Renderer *renderer, uint32_t deltaTime, std::vector
             bullet.position.y,
             bullet.width,
             bullet.height};
+
+        willDie = (bullet.position.y > float(windowHeight));
 
         for (size_t blockIndex = 0; blockIndex < blocks.size(); blockIndex++)
         {

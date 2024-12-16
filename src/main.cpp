@@ -125,7 +125,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
     if (event->type == SDL_EVENT_KEY_DOWN || event->type == SDL_EVENT_KEY_UP)
     {
-        config::hasStarted = true;
+        if (!config::hasStarted)
+        {
+            config::hasStarted = true;
+            config::isSwitchingNextStage = true;
+        }
 
         bool down = (event->type == SDL_EVENT_KEY_DOWN);
         if (event->key.key == SDLK_A || event->key.key == SDLK_LEFT)
@@ -283,7 +287,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     if (config::hasStarted)
     {
-        alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::deltaTime, config::player, config::alienMoveDownAmount);
+        alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::windowHeight, config::deltaTime, config::player, config::alienMoveDownAmount, config::global_particles);
     }
 
     if (config::aliens.size() == 0)
@@ -329,13 +333,29 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         healthBarRect.w = realHealthValue;
         SDL_RenderFillRect(renderer, &healthBarRect);
     }
-
-    if (config::isGameOver)
+    if (config::hasStarted == false || config::isGameOver)
     {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), "GAME OVER!");
+        config::menuScreenColorChangeDelay += config::deltaTime;
+        if (config::menuScreenColorChangeDelay > config::menuScreenColorChangeRate)
+        {
+            config::menuScreenColorChangeDelay = 0;
+            config::menuScreenColorIndex = (config::menuScreenColorIndex + 1) % 5;
+        }
+        Color textColors[] = {Color{1.f, 0.f, 0.f}, Color{0.f, 1.f, 0.f}, Color{0.f, 0.f, 1.f}, Color{0.5f, 0.5f, 0.f}, Color{0.9f, 0.8f, 0.1f}};
+        Color c = textColors[config::menuScreenColorIndex];
+
+        SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
+        if (config::hasStarted == false)
+        {
+            SDL_RenderDebugText(renderer, config::windowWidth / 2 - 100, config::windowHeight / 2, "PRESS ANY KEY TO START!!!");
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
+            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), "GAME OVER!");
+        }
     }
 
     SDL_RenderPresent(app->renderer);
