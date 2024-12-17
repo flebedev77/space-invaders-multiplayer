@@ -11,6 +11,7 @@
 #include "game/block.h"
 #include "game/util.h"
 #include "game/config.h"
+#include "game/controls.h"
 
 struct AppContext
 {
@@ -35,7 +36,7 @@ void invaders_init()
     int amt_horizontal = config::windowWidth / config::blockWidth;
     for (int j = 0; j < 2; j++)
     {
-        //top
+        // top
         for (int i = 0; i < amt_horizontal; i++)
         {
             srand(time(0) + i * 10);
@@ -47,7 +48,7 @@ void invaders_init()
             config::blocks.push_back(b);
         }
 
-        //bottom
+        // bottom
         for (int i = 0; i < amt_horizontal; i++)
         {
             srand(time(0) + i * 10);
@@ -156,32 +157,31 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
             invaders_init();
         }
 
-        using namespace config::keys;
         bool down = (event->type == SDL_EVENT_KEY_DOWN);
         if (event->key.key == SDLK_A)
         {
-            p1::left = down;
+            config::keys[0].left = down;
         }
         if (event->key.key == SDLK_D)
         {
-            p1::right = down;
+            config::keys[0].right = down;
         }
         if (event->key.key == SDLK_SPACE)
         {
-            p1::shoot = down;
+            config::keys[0].shoot = down;
         }
 
         if (event->key.key == SDLK_LEFT)
         {
-            p2::left = down;
+            config::keys[1].left = down;
         }
         if (event->key.key == SDLK_RIGHT)
         {
-            p2::right = down;
+            config::keys[1].right = down;
         }
         if (event->key.key == SDLK_QUESTION)
         {
-            p2::shoot = down;
+            config::keys[1].shoot = down;
         }
     }
 
@@ -211,22 +211,21 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     for (size_t i = 0; i < config::playerAmt; i++)
     {
         config::players[i].Draw(renderer, config::deltaTime);
-    }
+        if (config::keys[i].left)
+        {
+            config::players[i].Move(-1, config::deltaTime);
+        }
+        if (config::keys[i].right)
+        {
+            config::players[i].Move(1, config::deltaTime);
+        }
 
-    if (config::keys::p1::left)
-    {
-        config::players[0].Move(-1, config::deltaTime);
-    }
-    if (config::keys::p1::right)
-    {
-        config::players[0].Move(1, config::deltaTime);
-    }
-
-    config::players[0].shootDelay += config::deltaTime;
-    if (config::keys::p1::shoot && config::players[0].shootDelay > config::shootRate)
-    {
-        config::players[0].shootDelay = 0;
-        config::players[0].Shoot();
+        config::players[i].shootDelay += config::deltaTime;
+        if (config::keys[i].shoot && config::players[i].shootDelay > config::shootRate)
+        {
+            config::players[i].shootDelay = 0;
+            config::players[i].Shoot();
+        }
     }
 
     for (size_t i = 0; i < config::playerAmt; i++)

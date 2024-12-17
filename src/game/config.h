@@ -6,6 +6,7 @@
 #include "player.h"
 #include "block.h"
 #include "particle.h"
+#include "controls.h"
 
 namespace config
 {
@@ -51,19 +52,5 @@ namespace config
     uint32_t menuScreenColorChangeDelay = 0;
     uint32_t menuScreenColorChangeRate = 1000;
 
-    namespace keys
-    {
-        namespace p1
-        {
-            bool left = 0;
-            bool right = 0;
-            bool shoot = 0;
-        };
-        namespace p2
-        {
-            bool left = 0;
-            bool right = 0;
-            bool shoot = 0;
-        };
-    };
+    Controls keys[] = {Controls{}, Controls{}};
 };
