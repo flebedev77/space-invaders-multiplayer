@@ -23,6 +23,7 @@ struct Player {
     uint32_t shootDelay = 0;
 
     bool selectedTexture = 0;
+    bool lookingDown = 0;
 
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;

@@ -14,7 +14,14 @@ void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
 
     SDL_Texture **tex;
 
-    tex = (this->selectedTexture) ? &images::player_texture : &images::playerf2_texture;
+    if (this->lookingDown)
+    {
+        tex = (this->selectedTexture) ? &images::player2_texture : &images::player2f2_texture;
+    }
+    else
+    {
+        tex = (this->selectedTexture) ? &images::player_texture : &images::playerf2_texture;
+    }
 
     this->animationDelay += deltaTime;
     if (this->animationDelay > this->animationRate)
@@ -46,7 +53,7 @@ void Player::Shoot()
     //     this->position.x - 2.5f + 15.f,
     //     this->position.y - 25.f};
 
-    b.velocity.y = -0.3f;
+    b.velocity.y = (this->lookingDown) ? 0.3f : -0.3f;
     // b2.velocity.y = -0.3f;
     this->bullets.push_back(b);
     // this->bullets.push_back(b2);

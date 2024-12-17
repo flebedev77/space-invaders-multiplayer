@@ -31,6 +31,7 @@ void invaders_init()
 		config::players[i].position.y = config::playerSpawnPositions[i].y;
 		config::players[i].position.x = config::playerSpawnPositions[i].x;
 	}
+    config::players[0].lookingDown = 1;
 
 	config::blocks.clear();
 	int amt_horizontal = config::windowWidth / config::blockWidth;
