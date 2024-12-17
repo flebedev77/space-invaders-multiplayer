@@ -33,8 +33,21 @@ void invaders_init()
 
     config::blocks.clear();
     int amt_horizontal = config::windowWidth / config::blockWidth;
-    for (int j = 0; j < 3; j++)
+    for (int j = 0; j < 2; j++)
     {
+        //top
+        for (int i = 0; i < amt_horizontal; i++)
+        {
+            srand(time(0) + i * 10);
+            Block b{
+                float(i) * config::blockWidth,
+                float(config::wallHeightFromFloor + (j * config::blockHeight) - config::blockHeight),
+                config::blockWidth, config::blockHeight,
+                config::blockMaxHealth, static_cast<uint32_t>(rand())};
+            config::blocks.push_back(b);
+        }
+
+        //bottom
         for (int i = 0; i < amt_horizontal; i++)
         {
             srand(time(0) + i * 10);
@@ -305,7 +318,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         // health bar
         for (size_t i = 0; i < config::playerAmt; i++)
         {
-            Player& player = config::players[i];
+            Player &player = config::players[i];
             float y = (i == 0) ? 0 : config::windowHeight - config::healthbarHeight;
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_FRect healthBarRect{
