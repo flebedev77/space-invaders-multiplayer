@@ -2,6 +2,17 @@
 #include <SDL3/SDL.h>
 #include "util.h"
 
+struct ImageData
+{
+    SDL_Texture* texture = nullptr;
+    SDL_Surface* surface = nullptr;
+
+    ImageData(): texture(nullptr), surface(nullptr) {}
+
+    void Load(SDL_Renderer* renderer, unsigned char bmp_data[], unsigned int bmp_len);
+    void Free();
+};
+
 namespace images
 {
     extern SDL_Surface *player2_surface;
@@ -26,6 +37,8 @@ namespace images
     extern SDL_Texture *zap1f2_texture;
     extern SDL_Texture *zap2_texture;
     extern SDL_Texture *zap3_texture;
+
+    extern ImageData images[];
 
     void LoadImages(SDL_Renderer *renderer);
     void UnloadImages();

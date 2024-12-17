@@ -8,6 +8,8 @@
 #include "assets/zap1f2.h"
 #include "assets/zap2.h"
 #include "assets/zap3.h"
+#include "assets/playerblink.h"
+#include "assets/player2blink.h"
 
 SDL_Surface *images::player2_surface = nullptr;
 SDL_Surface *images::player2f2_surface = nullptr;
@@ -33,6 +35,13 @@ SDL_FRect images::player_src_rect;
 SDL_FRect images::zap_src_rect;
 
 float images::player_aspect;
+
+size_t images_len = 1;
+
+ImageData images[] = {
+    ImageData{},
+    ImageData{}
+};
 
 void images::LoadImages(SDL_Renderer *renderer)
 {
@@ -66,6 +75,9 @@ void images::LoadImages(SDL_Renderer *renderer)
 
     SDL_GetTextureSize(images::zap1_texture, &w, &h);
     images::zap_src_rect = SDL_FRect{0, 0, w, h};
+
+    images[0].Load(renderer, playerblink_bmp, playerblink_bmp_len);
+    images[1].Load(renderer, player2blink_bmp, player2blink_bmp_len);
 }
 
 void images::UnloadImages()
@@ -87,4 +99,21 @@ void images::UnloadImages()
     SDL_DestroyTexture(images::zap1f2_texture);
     SDL_DestroyTexture(images::zap2_texture);
     SDL_DestroyTexture(images::zap3_texture);
+
+    for(size_t i = 0; i < images_len; i++)
+    {
+        images[i].Free();
+    }
+}
+
+void ImageData::Load(SDL_Renderer *renderer, unsigned char bmp_data[], unsigned int bmp_len)
+{
+    this->surface = utils::loadEmbeddedBMP(renderer, bmp_data, bmp_len);
+    this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
+    SDL_DestroySurface(this->surface);
+}
+
+void ImageData::Free()
+{
+    SDL_DestroyTexture(this->texture);
 }
