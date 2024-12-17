@@ -149,16 +149,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
     if (event->type == SDL_EVENT_KEY_DOWN || event->type == SDL_EVENT_KEY_UP)
     {
-        if (!config::hasStarted)
+        bool down = (event->type == SDL_EVENT_KEY_DOWN);
+        if (down)
         {
-            config::hasStarted = true;
-        }
-        else if (config::isGameOver)
-        {
-            invaders_init();
+            if (!config::hasStarted)
+            {
+                config::hasStarted = true;
+            }
+            else if (config::isGameOver && config::gameOverRestartDelay > config::gameOverRestartRate)
+            {
+                config::gameOverRestartDelay = 0;
+                invaders_init();
+            }
         }
 
-        bool down = (event->type == SDL_EVENT_KEY_DOWN);
         if (event->key.key == SDLK_A)
         {
             config::keys[0].left = down;
@@ -421,13 +425,16 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         {
             SDL_RenderDebugText(renderer, config::windowWidth / 2 - 100, config::windowHeight / 2, "PRESS ANY KEY TO START!!!");
         }
-        else
+        else if (config::isGameOver)
         {
+            config::gameOverRestartDelay += config::deltaTime;
+
+            config::gameOverPlayerIndex = (config::players[0].health <= 0) ? 1 : 0;
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             int index2 = (config::menuScreenColorIndex + 1) % 5;
             SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
-            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), "GAME OVER!");
+            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), ("Player " + std::to_string(config::gameOverPlayerIndex + 1) + " Won!!").c_str());
             c = textColors[index2];
             SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
             SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 120.f, float(config::windowHeight / 2) + 50.f, "PRESS ANY KEY TO PLAY AGAIN!!!");
