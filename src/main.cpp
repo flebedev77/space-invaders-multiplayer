@@ -20,7 +20,7 @@ struct AppContext
     SDL_AppResult app_quit = SDL_APP_CONTINUE;
 };
 
-void SpawnParticles(float x, float y, int amt, float r, float g, float b);
+void SpawnParticles(float x, float y, int amt, float r, float g, float b, float spd = 0.1f);
 
 void invaders_init()
 {
@@ -36,29 +36,35 @@ void invaders_init()
 
     config::blocks.clear();
     int amt_horizontal = config::windowWidth / config::blockWidth;
-    for (int j = 0; j < 2; j++)
+    for (int j = 0; j < 1; j++)
     {
         // top
         for (int i = 0; i < amt_horizontal; i++)
         {
+            if (i % 2 == 1 || i % 3 == 1)
+                continue;
             srand(time(0) + i * 10);
             Block b{
                 float(i) * config::blockWidth,
                 float(config::wallHeightFromFloor + (j * config::blockHeight) - config::blockHeight),
                 config::blockWidth, config::blockHeight,
                 config::blockMaxHealth, static_cast<uint32_t>(rand())};
+            b.animationFrameDelay = i * 10;
             config::blocks.push_back(b);
         }
 
         // bottom
         for (int i = 0; i < amt_horizontal; i++)
         {
+            if (i % 2 == 0 || i % 3 == 0)
+                continue;
             srand(time(0) + i * 10);
             Block b{
                 float(i) * config::blockWidth,
                 float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
                 config::blockWidth, config::blockHeight,
                 config::blockMaxHealth, static_cast<uint32_t>(rand())};
+            b.animationFrameDelay = i * 10;
             config::blocks.push_back(b);
         }
     }
@@ -132,6 +138,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         config::stars[i].color.g = 1.f;
         config::stars[i].color.b = 1.f;
     }
+    SDL_SetRenderViewport(renderer, &config::cameraPos);
 
     return SDL_APP_CONTINUE;
 }
@@ -196,6 +203,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
+
     uint32_t currentTicks = SDL_GetTicks();
     config::deltaTime = currentTicks - config::prevTime;
     config::prevTime = currentTicks;
@@ -293,7 +301,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     {
                         willDie = true;
                         block.health -= config::bulletDamage;
-                        SpawnParticles(block.position.x, block.position.y, 5, 0.f, 0.f, 1.f);
+                        SpawnParticles(block.position.x, block.position.y, 5, 0.5f, 0.5f, 1.f);
                         if (block.health <= 0)
                         {
                             config::blocks.erase(config::blocks.begin() + blockIndex);
@@ -323,8 +331,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     {
         Player &a = config::players[i];
         SDL_FRect a_rect{
-            a.position.x,
-            a.position.y,
+            a.position.x - a.radius,
+            a.position.y - a.radius,
             a.radius * images::player_aspect,
             a.radius};
 
@@ -332,8 +340,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         {
             Player &b = config::players[j];
             SDL_FRect b_rect{
-                b.position.x,
-                b.position.y,
+                b.position.x - b.radius,
+                b.position.y - b.radius,
                 b.radius * images::player_aspect,
                 b.radius};
 
@@ -349,7 +357,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&b_rect, &bullet_rect))
                 {
                     b.health -= config::bulletDamage;
+                    SpawnParticles(b.position.x, b.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     a.bullets.erase(a.bullets.begin() + bulletIndex);
+                    b.hit = true;
                 }
             }
 
@@ -365,6 +375,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&a_rect, &bullet_rect))
                 {
                     a.health -= config::bulletDamage;
+                    a.hit = true;
+                    SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     b.bullets.erase(b.bullets.begin() + bulletIndex);
                 }
                 for (size_t aBulletIndex = 0; aBulletIndex < a.bullets.size(); aBulletIndex++)
@@ -379,6 +391,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
                     if (utils::aabb(&bullet_rect, &a_bullet_rect))
                     {
+                        SpawnParticles(bullet.position.x, bullet.position.y, 15, 0.9f, 0.8f, 0.1f);
                         b.bullets.erase(b.bullets.begin() + bulletIndex);
                         a.bullets.erase(a.bullets.begin() + aBulletIndex);
                     }
@@ -439,7 +452,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 SDL_RenderClear(renderer);
                 int index2 = (config::menuScreenColorIndex + 1) % 5;
                 SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
-                SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), ("Player " + std::to_string(config::gameOverPlayerIndex + 1) + " Won!!").c_str());
+                SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 50.f, float(config::windowHeight / 2), ("Player " + std::to_string(config::gameOverPlayerIndex + 1) + " Won!!").c_str());
                 c = textColors[index2];
                 SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
                 SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 120.f, float(config::windowHeight / 2) + 50.f, "PRESS ANY KEY TO PLAY AGAIN!!!");
@@ -465,7 +478,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
     SDL_Log("Application quit successfully!");
 }
 
-void SpawnParticles(float x, float y, int amt, float r, float g, float b)
+void SpawnParticles(float x, float y, int amt, float r, float g, float b, float spd)
 {
     for (int i = 0; i < amt; i++)
     {
@@ -475,10 +488,10 @@ void SpawnParticles(float x, float y, int amt, float r, float g, float b)
         p.color.r = r;
         p.color.g = g;
         p.color.b = b;
-        srand(time(0) + i);
-        float deg = (float(rand()) / 1000.f);
-        p.velocity.x = SDL_cosf(deg) * 0.1f;
-        p.velocity.y = SDL_sinf(deg) * 0.1f;
+        // srand(time(0) + i);
+        float deg = float(i); //(float(rand()) / 1000.f);
+        p.velocity.x = SDL_cosf(deg) * spd;
+        p.velocity.y = SDL_sinf(deg) * spd;
         config::global_particles.push_back(p);
     }
 }

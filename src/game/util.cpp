@@ -51,4 +51,43 @@ namespace utils
         }
         return text;
     }
+
+
+    void cameraShake(SDL_Rect& camera, int _iterations, int _intensity)
+    {
+        cameraShakeRunning = true;
+        cameraShakeDelay = 0;
+        utils::iterations = _iterations;
+        utils::intensity = _intensity;
+    }
+    void cameraUpdate(SDL_Rect& camera, uint32_t deltaTime)
+    {
+        if (!cameraShakeRunning)
+        {
+            cameraShakeDelay += deltaTime;
+            if (cameraShakeDelay > cameraShakeRate)
+            {
+                cameraShakeDelay = 0;
+                if (iterations <= 0)
+                {
+                    cameraShakeRunning = false;
+                    iterations = 5;
+                }
+                iterations--;
+
+                long seed = time(0) + deltaTime * 100 + iterations; 
+                srand(seed);
+                int xneg = (rand() % 3) - 1;
+                srand(seed+1);
+                int xmove = (rand() % intensity) * xneg;
+
+                camera.x += xmove;
+            }
+        }
+        else 
+        {
+            camera.x = 0;
+            camera.y = 0;
+        }
+    }
 }

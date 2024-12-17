@@ -12,6 +12,9 @@ namespace config
 {
     constexpr int windowWidth = 400;
     constexpr int windowHeight = 500;
+
+    SDL_Rect cameraPos{0, 0, windowWidth, windowHeight};
+
     Color backgroundColor{30.f, 30.f, 30.f};
 
     size_t playerAmt = 2;
@@ -29,7 +32,7 @@ namespace config
     constexpr float blockWidth = 20.f;
     constexpr float blockHeight = 20.f;
 
-    constexpr int blockMaxHealth = 100;
+    constexpr int blockMaxHealth = 10;
     constexpr int wallHeightFromFloor = 100;
 
     constexpr int bulletDamage = 25;
@@ -48,7 +51,7 @@ namespace config
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;
 
-    uint32_t shootRate = 70; // 70ms
+    uint32_t shootRate = 500; // 70ms
 
     int menuScreenColorIndex = 0;
     uint32_t menuScreenColorChangeDelay = 0;

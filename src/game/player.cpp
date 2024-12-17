@@ -28,7 +28,7 @@ void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
         this->selectedTexture = !this->selectedTexture;
     }
 
-    if (this->blinking)
+    if (this->blinking || this->hit)
     {
         this->blinkingDelay += deltaTime;
         if (this->blinkingDelay > this->blinkingRate)
@@ -40,6 +40,15 @@ void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
         if (this->blinkSpriteCurrent)
         {
             tex = (this->lookingDown) ? &images::images[1].texture : &images::images[0].texture;
+        }
+
+        if (this->hit)
+        {
+            this->hitCooldownDelay += deltaTime;
+            if (this->hitCooldownDelay > this->hitCooldownRate) {
+                this->hit = false;
+                this->hitCooldownDelay = 0;
+            }
         }
     }
 
@@ -56,8 +65,10 @@ void Player::Move(int direction, uint32_t deltaTime)
 
 void Player::Shoot()
 {
+    if (this->health <= 0) return;
+
     this->prevShotLeft = !this->prevShotLeft;
-    float num = (this->prevShotLeft) ? 15.f : -15.f;
+    float num = 0.f;//(this->prevShotLeft) ? 15.f : -15.f;
     Bullet b{
         this->position.x - 2.5f + num,
         this->position.y - 25.f};
@@ -66,7 +77,8 @@ void Player::Shoot()
     //     this->position.x - 2.5f + 15.f,
     //     this->position.y - 25.f};
 
-    b.velocity.y = (this->lookingDown) ? 0.3f : -0.3f;
+    float bulletSpeed = 1.7f;
+    b.velocity.y = (this->lookingDown) ? bulletSpeed : -bulletSpeed;
     // b2.velocity.y = -0.3f;
     this->bullets.push_back(b);
     // this->bullets.push_back(b2);

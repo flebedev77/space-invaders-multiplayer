@@ -9,7 +9,7 @@ struct Block
     Vector2 position{};
     float width = 0.f;
     float height = 0.f;
-    int health = 100;
+    int health = 10;
     bool animated = true;
     bool frame = 0;
 
