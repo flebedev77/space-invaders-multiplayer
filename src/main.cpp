@@ -27,8 +27,8 @@ void invaders_init()
     for (size_t i = 0; i < config::playerAmt; i++)
     {
         config::players[i].health = config::players[i].maxHealth;
-        config::players[i].position.y = config::playerSpawnPositions[i].x;
-        config::players[i].position.x = config::playerSpawnPositions[i].y;
+        config::players[i].position.y = config::playerSpawnPositions[i].y;
+        config::players[i].position.x = config::playerSpawnPositions[i].x;
     }
 
     config::blocks.clear();
@@ -218,7 +218,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     for (size_t i = 0; i < config::playerAmt; i++)
     {
-        Player& player = config::players[i];
+        Player &player = config::players[i];
         if (player.position.x < player.radius)
         {
             player.position.x = player.radius;
@@ -242,48 +242,52 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         }
     }
 
-    for (size_t i = 0; i < config::player.bullets.size(); i++)
+    for (size_t playerIndex = 0; playerIndex < config::playerAmt; playerIndex++)
     {
-        Bullet &bullet = config::player.bullets.at(i);
-
-        bullet.Update(config::deltaTime);
-        bullet.Draw(renderer);
-
-        bool willDie = (bullet.position.y < -bullet.height);
-
-        if (!willDie)
+        Player &player = config::players[playerIndex];
+        for (size_t i = 0; i < player.bullets.size(); i++)
         {
-            SDL_FRect bulletRect{
-                bullet.position.x,
-                bullet.position.y,
-                bullet.width,
-                bullet.height};
-            for (size_t blockIndex = 0; blockIndex < config::blocks.size(); blockIndex++)
-            {
-                Block &block = config::blocks.at(blockIndex);
-                SDL_FRect blockRect{
-                    block.position.x,
-                    block.position.y,
-                    block.width,
-                    block.height};
+            Bullet &bullet = player.bullets.at(i);
 
-                if (utils::aabb(&blockRect, &bulletRect))
+            bullet.Update(config::deltaTime);
+            bullet.Draw(renderer);
+
+            bool willDie = (bullet.position.y < -bullet.height);
+
+            if (!willDie)
+            {
+                SDL_FRect bulletRect{
+                    bullet.position.x,
+                    bullet.position.y,
+                    bullet.width,
+                    bullet.height};
+                for (size_t blockIndex = 0; blockIndex < config::blocks.size(); blockIndex++)
                 {
-                    willDie = true;
-                    block.health -= config::bulletDamage;
-                    SpawnParticles(block.position.x, block.position.y, 5, 0.f, 0.f, 1.f);
-                    if (block.health <= 0)
+                    Block &block = config::blocks.at(blockIndex);
+                    SDL_FRect blockRect{
+                        block.position.x,
+                        block.position.y,
+                        block.width,
+                        block.height};
+
+                    if (utils::aabb(&blockRect, &bulletRect))
                     {
-                        config::blocks.erase(config::blocks.begin() + blockIndex);
+                        willDie = true;
+                        block.health -= config::bulletDamage;
+                        SpawnParticles(block.position.x, block.position.y, 5, 0.f, 0.f, 1.f);
+                        if (block.health <= 0)
+                        {
+                            config::blocks.erase(config::blocks.begin() + blockIndex);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
-        }
 
-        if (willDie)
-        {
-            config::player.bullets.erase(config::player.bullets.begin() + i);
+            if (willDie)
+            {
+                player.bullets.erase(player.bullets.begin() + i);
+            }
         }
     }
 
@@ -294,50 +298,28 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         block.Draw(renderer, config::deltaTime);
     }
 
-    if (config::hasStarted)
-    {
-
-        if (config::stageNum > config::bestStageNum)
-        {
-            config::bestStageNum = config::stageNum;
-        }
-
-        // drawing stats
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        std::string text = "Kills: " + utils::formatZerosString(config::displayDigitAmt, config::playerKills);
-        SDL_RenderDebugText(renderer, 5.f, 5.f, text.c_str());
-    }
-
-    if (config::isSwitchingNextStage)
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDebugText(renderer, config::windowWidth / 2 - 10, config::windowHeight / 2, ("Stage " + std::to_string(config::stageNum)).c_str());
-
-        config::switchingNextStageDelay += config::deltaTime;
-        if (config::switchingNextStageDelay > config::switchingNextStageRate)
-        {
-            config::switchingNextStageDelay = 0;
-            config::isSwitchingNextStage = false;
-        }
-    }
-
-    config::isGameOver = (config::player.health <= 0);
+    config::isGameOver = (config::players[0].health <= 0 || config::players[1].health <= 0);
 
     if (config::hasStarted)
     {
         // health bar
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_FRect healthBarRect{
-            0,
-            config::windowHeight - config::healthbarHeight,
-            config::healthbarWidth,
-            config::healthbarHeight};
-        SDL_RenderFillRect(renderer, &healthBarRect);
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        config::player.playerSmoothHealth = utils::lerp(config::player.playerSmoothHealth, float(config::player.health), 0.01f * float(config::deltaTime));
-        float realHealthValue = (float(config::player.playerSmoothHealth) / float(config::player.maxHealth)) * config::healthbarWidth;
-        healthBarRect.w = realHealthValue;
-        SDL_RenderFillRect(renderer, &healthBarRect);
+        for (size_t i = 0; i < config::playerAmt; i++)
+        {
+            Player& player = config::players[i];
+            float y = (i == 0) ? 0 : config::windowHeight - config::healthbarHeight;
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_FRect healthBarRect{
+                0,
+                y,
+                config::healthbarWidth,
+                config::healthbarHeight};
+            SDL_RenderFillRect(renderer, &healthBarRect);
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            player.playerSmoothHealth = utils::lerp(player.playerSmoothHealth, float(player.health), 0.01f * float(config::deltaTime));
+            float realHealthValue = (float(player.playerSmoothHealth) / float(player.maxHealth)) * config::healthbarWidth;
+            healthBarRect.w = realHealthValue;
+            SDL_RenderFillRect(renderer, &healthBarRect);
+        }
     }
     if (config::hasStarted == false || config::isGameOver)
     {

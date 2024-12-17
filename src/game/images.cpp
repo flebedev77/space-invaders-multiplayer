@@ -1,6 +1,4 @@
 #include "images.h"
-#include "assets/alien.h"
-#include "assets/alienf2.h"
 #include "assets/bullet.h"
 #include "assets/player.h"
 #include "assets/playerf2.h"
@@ -41,8 +39,6 @@ float images::player_aspect;
 void images::LoadImages(SDL_Renderer *renderer)
 {
     // surfaces
-    images::alien_surface = utils::loadEmbeddedBMP(renderer, alien_bmp, alien_bmp_len);
-    images::alienf2_surface = utils::loadEmbeddedBMP(renderer, alienf2_bmp, alienf2_bmp_len);
     images::bullet_surface = utils::loadEmbeddedBMP(renderer, bullet_bmp, bullet_bmp_len);
     images::player_surface = utils::loadEmbeddedBMP(renderer, player_bmp, player_bmp_len);
     images::playerf2_surface = utils::loadEmbeddedBMP(renderer, playerf2_bmp, playerf2_bmp_len);
@@ -52,8 +48,6 @@ void images::LoadImages(SDL_Renderer *renderer)
     images::zap3_surface = utils::loadEmbeddedBMP(renderer, zap3_bmp, zap3_bmp_len);
 
     // textures
-    images::alien_texture = SDL_CreateTextureFromSurface(renderer, images::alien_surface);
-    images::alienf2_texture = SDL_CreateTextureFromSurface(renderer, images::alienf2_surface);
     images::bullet_texture = SDL_CreateTextureFromSurface(renderer, images::bullet_surface);
     images::player_texture = SDL_CreateTextureFromSurface(renderer, images::player_surface);
     images::playerf2_texture = SDL_CreateTextureFromSurface(renderer, images::playerf2_surface);
@@ -64,11 +58,6 @@ void images::LoadImages(SDL_Renderer *renderer)
 
     // setting up the src sizes;
     float w, h;
-
-    SDL_GetTextureSize(images::alien_texture, &w, &h);
-    SDL_Log("Alien texture size W: %f H %f", w, h);
-    images::alien_aspect = w / h;
-    images::alien_src_rect = SDL_FRect{0, 0, w, h};
 
     SDL_GetTextureSize(images::player_texture, &w, &h);
     SDL_Log("Player texture size W: %f H %f", w, h);
@@ -86,8 +75,6 @@ void images::LoadImages(SDL_Renderer *renderer)
 
 void images::UnloadImages()
 {
-    SDL_DestroySurface(images::alien_surface);
-    SDL_DestroySurface(images::alienf2_surface);
     SDL_DestroySurface(images::bullet_surface);
     SDL_DestroySurface(images::player_surface);
     SDL_DestroySurface(images::playerf2_surface);
@@ -96,8 +83,6 @@ void images::UnloadImages()
     SDL_DestroySurface(images::zap2_surface);
     SDL_DestroySurface(images::zap3_surface);
 
-    SDL_DestroyTexture(images::alien_texture);
-    SDL_DestroyTexture(images::alienf2_texture);
     SDL_DestroyTexture(images::bullet_texture);
     SDL_DestroyTexture(images::player_texture);
     SDL_DestroyTexture(images::playerf2_texture);

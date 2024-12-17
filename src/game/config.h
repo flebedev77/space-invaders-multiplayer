@@ -16,7 +16,7 @@ namespace config
     size_t playerAmt = 2;
     Player players[] = {Player{}, Player{}};
     Vector2 playerSpawnPositions[] = {
-        Vector2{float(windowWidth / 2), 20.f},                    // top player
+        Vector2{float(windowWidth / 2), 40.f},                    // top player
         Vector2{float(windowWidth / 2), float(windowHeight - 20)} // bottom player
     };
     std::vector<Block> blocks;
