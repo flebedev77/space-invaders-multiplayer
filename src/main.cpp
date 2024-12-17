@@ -4,6 +4,7 @@
 #include <ctime>
 #include <random>
 #include <cstdlib>
+#include <string>
 #include "game/images.h"
 #include "game/player.h"
 #include "game/block.h"
