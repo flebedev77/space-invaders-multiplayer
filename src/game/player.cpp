@@ -28,6 +28,21 @@ void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
         this->selectedTexture = !this->selectedTexture;
     }
 
+    if (this->blinking)
+    {
+        this->blinkingDelay += deltaTime;
+        if (this->blinkingDelay > this->blinkingRate)
+        {
+            this->blinkingDelay = 0;
+            this->blinkSpriteCurrent = !this->blinkSpriteCurrent;
+        }
+
+        if (this->blinkSpriteCurrent)
+        {
+            tex = (this->lookingDown) ? &images::images[1].texture : &images::images[0].texture;
+        }
+    }
+
     if (tex != nullptr)
     {
         SDL_RenderTexture(renderer, *(tex), &images::player_src_rect, &rect);

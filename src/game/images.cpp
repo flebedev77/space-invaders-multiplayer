@@ -38,7 +38,7 @@ float images::player_aspect;
 
 size_t images_len = 1;
 
-ImageData images[] = {
+ImageData images::images[] = {
     ImageData{},
     ImageData{}
 };
@@ -76,8 +76,8 @@ void images::LoadImages(SDL_Renderer *renderer)
     SDL_GetTextureSize(images::zap1_texture, &w, &h);
     images::zap_src_rect = SDL_FRect{0, 0, w, h};
 
-    images[0].Load(renderer, playerblink_bmp, playerblink_bmp_len);
-    images[1].Load(renderer, player2blink_bmp, player2blink_bmp_len);
+    images::images[0].Load(renderer, playerblink_bmp, playerblink_bmp_len);
+    images::images[1].Load(renderer, player2blink_bmp, player2blink_bmp_len);
 }
 
 void images::UnloadImages()
@@ -111,6 +111,13 @@ void ImageData::Load(SDL_Renderer *renderer, unsigned char bmp_data[], unsigned 
     this->surface = utils::loadEmbeddedBMP(renderer, bmp_data, bmp_len);
     this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
     SDL_DestroySurface(this->surface);
+
+    float w, h;
+    SDL_GetTextureSize(this->texture, &w, &h);
+
+    this->rect.w = w;
+    this->rect.h = h;
+    this->aspect = w / h;
 }
 
 void ImageData::Free()

@@ -26,6 +26,11 @@ struct Player {
     bool lookingDown = 0;
     bool prevShotLeft = false;
 
+    bool blinking = true;
+    bool blinkSpriteCurrent = false;
+    uint32_t blinkingRate = 200;
+    uint32_t blinkingDelay = 0;
+
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;
         position.y = pos.y;

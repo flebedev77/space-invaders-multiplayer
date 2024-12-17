@@ -6,6 +6,8 @@ struct ImageData
 {
     SDL_Texture* texture = nullptr;
     SDL_Surface* surface = nullptr;
+    SDL_FRect rect{0, 0, 0, 0};
+    float aspect = 0.f;
 
     ImageData(): texture(nullptr), surface(nullptr) {}
 
