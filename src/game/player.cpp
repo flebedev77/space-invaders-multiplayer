@@ -1,7 +1,5 @@
 #include "player.h"
 
-bool prevShotLeft = false;
-
 void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
 {
     // drawUtils::DrawCircle(renderer, this->position, this->radius);
@@ -43,8 +41,8 @@ void Player::Move(int direction, uint32_t deltaTime)
 
 void Player::Shoot()
 {
-    prevShotLeft = !prevShotLeft;
-    float num = (prevShotLeft) ? 15.f : -15.f;
+    this->prevShotLeft = !this->prevShotLeft;
+    float num = (this->prevShotLeft) ? 15.f : -15.f;
     Bullet b{
         this->position.x - 2.5f + num,
         this->position.y - 25.f};

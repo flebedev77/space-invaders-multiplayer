@@ -362,6 +362,22 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     a.health -= config::bulletDamage;
                     b.bullets.erase(b.bullets.begin() + bulletIndex);
                 }
+                for (size_t aBulletIndex = 0; aBulletIndex < a.bullets.size(); aBulletIndex++)
+                {
+                    Bullet &aBullet = a.bullets.at(aBulletIndex);
+
+                    SDL_FRect a_bullet_rect{
+                        aBullet.position.x,
+                        aBullet.position.y,
+                        aBullet.width,
+                        aBullet.height};
+
+                    if (utils::aabb(&bullet_rect, &a_bullet_rect))
+                    {
+                        b.bullets.erase(b.bullets.begin() + bulletIndex);
+                        a.bullets.erase(a.bullets.begin() + aBulletIndex);
+                    }
+                }
             }
         }
     }

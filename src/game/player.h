@@ -24,6 +24,7 @@ struct Player {
 
     bool selectedTexture = 0;
     bool lookingDown = 0;
+    bool prevShotLeft = false;
 
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {
         position.x = pos.x;
