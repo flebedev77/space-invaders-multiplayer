@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
 #include <cstdint>
+#include "vector2.h"
 #include "color.h"
 #include "player.h"
 #include "block.h"
-#include "alien.h"
 #include "particle.h"
 
 namespace config
@@ -13,13 +13,13 @@ namespace config
     constexpr int windowHeight = 500;
     Color backgroundColor{30.f, 30.f, 30.f};
 
-    Player player = Player{};
-    uint16_t playerKills = 0;
+    size_t playerAmt = 2;
+    Player players[] = {Player{}, Player{}};
+    Vector2 playerSpawnPositions[] = {
+        Vector2{float(windowWidth / 2), 20.f},                    // top player
+        Vector2{float(windowWidth / 2), float(windowHeight - 20)} // bottom player
+    };
     std::vector<Block> blocks;
-    std::vector<Alien> aliens;
-    int alien_amt_h = 3;
-    int alien_amt_v = 2;
-    float alienMoveDownAmount = 5.f;
 
     constexpr size_t stars_amt = 64;
     Particle stars[stars_amt];
@@ -38,18 +38,13 @@ namespace config
 
     bool hasStarted = false;
     bool isGameOver = false;
-    bool isSwitchingNextStage = false;
+    char gameOverPlayerIndex = 0;
 
     uint16_t displayDigitAmt = 4;
-    uint16_t stageNum = 1;
-    uint16_t bestStageNum = 1;
-    uint32_t switchingNextStageDelay = 0;
-    uint32_t switchingNextStageRate = 1500;
 
     uint32_t prevTime = SDL_GetTicks();
     uint32_t deltaTime = 0;
 
-    uint32_t shootDelay = 0;
     uint32_t shootRate = 70; // 70ms
 
     int menuScreenColorIndex = 0;
@@ -58,8 +53,17 @@ namespace config
 
     namespace keys
     {
-        bool left = 0;
-        bool right = 0;
-        bool shoot = 0;
+        namespace p1
+        {
+            bool left = 0;
+            bool right = 0;
+            bool shoot = 0;
+        };
+        namespace p2
+        {
+            bool left = 0;
+            bool right = 0;
+            bool shoot = 0;
+        };
     };
 };

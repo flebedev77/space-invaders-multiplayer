@@ -20,6 +20,8 @@ struct Player {
     uint32_t animationDelay = 400;
     uint32_t animationRate = 600;
 
+    uint32_t shootDelay = 0;
+
     bool selectedTexture = 0;
 
     Player(Vector2 pos = Vector2{}, float r = 20.f): position(Vector2{}), radius(r) {

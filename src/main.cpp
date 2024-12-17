@@ -9,8 +9,6 @@
 #include "game/images.h"
 #include "game/player.h"
 #include "game/block.h"
-#include "game/alienmanager.h"
-#include "game/alien.h"
 #include "game/util.h"
 #include "game/config.h"
 
@@ -22,6 +20,33 @@ struct AppContext
 };
 
 void SpawnParticles(float x, float y, int amt, float r, float g, float b);
+
+void invaders_init()
+{
+
+    for (size_t i = 0; i < config::playerAmt; i++)
+    {
+        config::players[i].health = config::players[i].maxHealth;
+        config::players[i].position.y = config::playerSpawnPositions[i].x;
+        config::players[i].position.x = config::playerSpawnPositions[i].y;
+    }
+
+    config::blocks.clear();
+    int amt_horizontal = config::windowWidth / config::blockWidth;
+    for (int j = 0; j < 3; j++)
+    {
+        for (int i = 0; i < amt_horizontal; i++)
+        {
+            srand(time(0) + i * 10);
+            Block b{
+                float(i) * config::blockWidth,
+                float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
+                config::blockWidth, config::blockHeight,
+                config::blockMaxHealth, static_cast<uint32_t>(rand())};
+            config::blocks.push_back(b);
+        }
+    }
+}
 
 SDL_AppResult SDL_Fail()
 {
@@ -74,27 +99,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 
     SDL_Log("Application started successfully!");
 
-    config::player.position.y = (float)config::windowHeight - 20;
-    config::player.position.x = (float)config::windowWidth / 2;
-
-    int amt_horizontal = config::windowWidth / config::blockWidth;
-    for (int j = 0; j < 3; j++)
-    {
-        for (int i = 0; i < amt_horizontal; i++)
-        {
-            srand(time(0) + i * 10);
-            Block b{
-                float(i) * config::blockWidth,
-                float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
-                config::blockWidth, config::blockHeight,
-                config::blockMaxHealth, static_cast<uint32_t>(rand())};
-            config::blocks.push_back(b);
-        }
-    }
+    invaders_init();
 
     images::LoadImages(renderer);
-
-    alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
 
     for (size_t i = 0; i < config::stars_amt; i++)
     {
@@ -130,49 +137,38 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
         if (!config::hasStarted)
         {
             config::hasStarted = true;
-            config::isSwitchingNextStage = true;
         }
         else if (config::isGameOver)
         {
-            config::aliens.clear();
-            config::blocks.clear();
-            config::player.health = config::player.maxHealth;
-
-            // rebuild the wall
-            int amt_horizontal = config::windowWidth / config::blockWidth;
-            for (int j = 0; j < 3; j++)
-            {
-                for (int i = 0; i < amt_horizontal; i++)
-                {
-                    srand(time(0) + i * 10);
-                    Block b{
-                        float(i) * config::blockWidth,
-                        float(config::windowHeight - config::wallHeightFromFloor - (j * config::blockHeight)),
-                        config::blockWidth, config::blockHeight,
-                        config::blockMaxHealth, static_cast<uint32_t>(rand())};
-                    config::blocks.push_back(b);
-                }
-            }
-
-            config::alien_amt_h = 4;
-            config::alien_amt_v = 2;
-            config::playerKills = 0;
-            config::stageNum = 1;
-            alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
+            invaders_init();
         }
 
+        using namespace config::keys;
         bool down = (event->type == SDL_EVENT_KEY_DOWN);
-        if (event->key.key == SDLK_A || event->key.key == SDLK_LEFT)
+        if (event->key.key == SDLK_A)
         {
-            config::keys::left = down;
+            p1::left = down;
         }
-        if (event->key.key == SDLK_D || event->key.key == SDLK_RIGHT)
+        if (event->key.key == SDLK_D)
         {
-            config::keys::right = down;
+            p1::right = down;
         }
         if (event->key.key == SDLK_SPACE)
         {
-            config::keys::shoot = down;
+            p1::shoot = down;
+        }
+
+        if (event->key.key == SDLK_LEFT)
+        {
+            p2::left = down;
+        }
+        if (event->key.key == SDLK_RIGHT)
+        {
+            p2::right = down;
+        }
+        if (event->key.key == SDLK_QUESTION)
+        {
+            p2::shoot = down;
         }
     }
 
@@ -199,31 +195,38 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     SDL_SetRenderDrawColor(renderer, 255, 4, 4, 255);
     SDL_RenderDebugText(renderer, config::windowWidth / 2 - 50, 10, "SPACE INVADERS");
-    config::player.Draw(renderer, config::deltaTime);
-
-    if (config::keys::left)
+    for (size_t i = 0; i < config::playerAmt; i++)
     {
-        config::player.Move(-1, config::deltaTime);
-    }
-    if (config::keys::right)
-    {
-        config::player.Move(1, config::deltaTime);
+        config::players[i].Draw(renderer, config::deltaTime);
     }
 
-    config::shootDelay += config::deltaTime;
-    if (config::keys::shoot && config::shootDelay > config::shootRate)
+    if (config::keys::p1::left)
     {
-        config::shootDelay = 0;
-        config::player.Shoot();
+        config::players[0].Move(-1, config::deltaTime);
+    }
+    if (config::keys::p1::right)
+    {
+        config::players[0].Move(1, config::deltaTime);
     }
 
-    if (config::player.position.x < config::player.radius)
+    config::players[0].shootDelay += config::deltaTime;
+    if (config::keys::p1::shoot && config::players[0].shootDelay > config::shootRate)
     {
-        config::player.position.x = config::player.radius;
+        config::players[0].shootDelay = 0;
+        config::players[0].Shoot();
     }
-    if (config::player.position.x > config::windowWidth - config::player.radius)
+
+    for (size_t i = 0; i < config::playerAmt; i++)
     {
-        config::player.position.x = config::windowWidth - config::player.radius;
+        Player& player = config::players[i];
+        if (player.position.x < player.radius)
+        {
+            player.position.x = player.radius;
+        }
+        if (player.position.x > config::windowWidth - player.radius)
+        {
+            player.position.x = config::windowWidth - player.radius;
+        }
     }
 
     for (size_t i = 0; i < config::global_particles.size(); i++)
@@ -276,31 +279,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     break;
                 }
             }
-
-            for (size_t alienIndex = 0; alienIndex < config::aliens.size(); alienIndex++)
-            {
-                Alien &alien = config::aliens.at(alienIndex);
-
-                SDL_FRect alienRect{
-                    alien.position.x,
-                    alien.position.y,
-                    alien.width,
-                    alien.height};
-
-                if (utils::aabb(&bulletRect, &alienRect))
-                {
-                    willDie = true;
-                    alien.health -= config::bulletDamage;
-                    SpawnParticles(alien.position.x, alien.position.y, 10, 0.5f, 0.f, 0.5f);
-                    if (alien.health <= 0)
-                    {
-                        SpawnParticles(alien.position.x, alien.position.y, 50, 1.f, 0.f, 1.f);
-                        config::playerKills++;
-                        config::aliens.erase(config::aliens.begin() + alienIndex);
-                    }
-                    break;
-                }
-            }
         }
 
         if (willDie)
@@ -318,33 +296,16 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
     if (config::hasStarted)
     {
-        alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::windowHeight, config::deltaTime, config::player, config::alienMoveDownAmount, config::global_particles);
 
         if (config::stageNum > config::bestStageNum)
         {
             config::bestStageNum = config::stageNum;
         }
 
-        //drawing stats
+        // drawing stats
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         std::string text = "Kills: " + utils::formatZerosString(config::displayDigitAmt, config::playerKills);
         SDL_RenderDebugText(renderer, 5.f, 5.f, text.c_str());
-        text = "Stage: " + utils::formatZerosString(config::displayDigitAmt, config::stageNum);
-        SDL_RenderDebugText(renderer, 5.f, 15.f, text.c_str());
-        text = "Best stage: " + utils::formatZerosString(config::displayDigitAmt, config::bestStageNum);
-        SDL_RenderDebugText(renderer, 5.f, 25.f, text.c_str());
-    }
-
-    if (config::aliens.size() == 0)
-    {
-        config::isSwitchingNextStage = true;
-        if (config::alien_amt_h < 10)
-        {
-            config::alien_amt_h++;
-        }
-        config::alien_amt_v++;
-        config::stageNum++;
-        alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
     }
 
     if (config::isSwitchingNextStage)
@@ -360,7 +321,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         }
     }
 
-    config::isGameOver = (config::aliens.back().position.y > float(config::windowHeight - config::wallHeightFromFloor - 5.f)) || (config::player.health <= 0);
+    config::isGameOver = (config::player.health <= 0);
 
     if (config::hasStarted)
     {
