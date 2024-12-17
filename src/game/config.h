@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstdint>
 #include "color.h"
 #include "player.h"
 #include "block.h"
@@ -13,11 +14,12 @@ namespace config
     Color backgroundColor{30.f, 30.f, 30.f};
 
     Player player = Player{};
+    uint16_t playerKills = 0;
     std::vector<Block> blocks;
     std::vector<Alien> aliens;
     int alien_amt_h = 3;
     int alien_amt_v = 2;
-    float alienMoveDownAmount = 4.f;
+    float alienMoveDownAmount = 5.f;
 
     constexpr size_t stars_amt = 64;
     Particle stars[stars_amt];
@@ -38,7 +40,9 @@ namespace config
     bool isGameOver = false;
     bool isSwitchingNextStage = false;
 
-    uint8_t stageNum = 1;
+    uint16_t displayDigitAmt = 4;
+    uint16_t stageNum = 1;
+    uint16_t bestStageNum = 1;
     uint32_t switchingNextStageDelay = 0;
     uint32_t switchingNextStageRate = 1500;
 
@@ -46,7 +50,7 @@ namespace config
     uint32_t deltaTime = 0;
 
     uint32_t shootDelay = 0;
-    uint32_t shootRate = 70; // 170ms
+    uint32_t shootRate = 70; // 70ms
 
     int menuScreenColorIndex = 0;
     uint32_t menuScreenColorChangeDelay = 0;

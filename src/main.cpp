@@ -5,6 +5,7 @@
 #include <random>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include "game/images.h"
 #include "game/player.h"
 #include "game/block.h"
@@ -155,6 +156,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
             config::alien_amt_h = 4;
             config::alien_amt_v = 2;
+            config::playerKills = 0;
+            config::stageNum = 1;
             alienmgr::SpawnAliens(config::alien_amt_h, config::alien_amt_v, config::aliens);
         }
 
@@ -292,6 +295,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     if (alien.health <= 0)
                     {
                         SpawnParticles(alien.position.x, alien.position.y, 50, 1.f, 0.f, 1.f);
+                        config::playerKills++;
                         config::aliens.erase(config::aliens.begin() + alienIndex);
                     }
                     break;
@@ -315,6 +319,20 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     if (config::hasStarted)
     {
         alienmgr::UpdateAliens(renderer, config::aliens, config::blocks, config::windowWidth, config::windowHeight, config::deltaTime, config::player, config::alienMoveDownAmount, config::global_particles);
+
+        if (config::stageNum > config::bestStageNum)
+        {
+            config::bestStageNum = config::stageNum;
+        }
+
+        //drawing stats
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        std::string text = "Kills: " + utils::formatZerosString(config::displayDigitAmt, config::playerKills);
+        SDL_RenderDebugText(renderer, 5.f, 5.f, text.c_str());
+        text = "Stage: " + utils::formatZerosString(config::displayDigitAmt, config::stageNum);
+        SDL_RenderDebugText(renderer, 5.f, 15.f, text.c_str());
+        text = "Best stage: " + utils::formatZerosString(config::displayDigitAmt, config::bestStageNum);
+        SDL_RenderDebugText(renderer, 5.f, 25.f, text.c_str());
     }
 
     if (config::aliens.size() == 0)
