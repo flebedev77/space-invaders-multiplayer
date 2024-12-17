@@ -43,7 +43,7 @@ void Player::Draw(SDL_Renderer *renderer, uint32_t deltaTime)
         }
     }
 
-    if (tex != nullptr)
+    if (tex != nullptr && this->health > 0)
     {
         SDL_RenderTexture(renderer, *(tex), &images::player_src_rect, &rect);
     }

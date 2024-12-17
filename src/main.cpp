@@ -30,6 +30,7 @@ void invaders_init()
         config::players[i].health = config::players[i].maxHealth;
         config::players[i].position.y = config::playerSpawnPositions[i].y;
         config::players[i].position.x = config::playerSpawnPositions[i].x;
+        config::players[i].blinking = false;
     }
     config::players[0].lookingDown = 1;
 
@@ -430,14 +431,19 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             config::gameOverRestartDelay += config::deltaTime;
 
             config::gameOverPlayerIndex = (config::players[0].health <= 0) ? 1 : 0;
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
-            int index2 = (config::menuScreenColorIndex + 1) % 5;
-            SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
-            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), ("Player " + std::to_string(config::gameOverPlayerIndex + 1) + " Won!!").c_str());
-            c = textColors[index2];
-            SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
-            SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 120.f, float(config::windowHeight / 2) + 50.f, "PRESS ANY KEY TO PLAY AGAIN!!!");
+            config::players[config::gameOverPlayerIndex].blinking = true;
+
+            if (config::gameOverRestartDelay > config::gameOverRestartRate)
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderClear(renderer);
+                int index2 = (config::menuScreenColorIndex + 1) % 5;
+                SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
+                SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 45.f, float(config::windowHeight / 2), ("Player " + std::to_string(config::gameOverPlayerIndex + 1) + " Won!!").c_str());
+                c = textColors[index2];
+                SDL_SetRenderDrawColorFloat(renderer, c.r, c.b, c.g, 1.f);
+                SDL_RenderDebugText(renderer, float(config::windowWidth / 2) - 120.f, float(config::windowHeight / 2) + 50.f, "PRESS ANY KEY TO PLAY AGAIN!!!");
+            }
         }
     }
 

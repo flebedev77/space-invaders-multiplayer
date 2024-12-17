@@ -26,7 +26,7 @@ struct Player {
     bool lookingDown = 0;
     bool prevShotLeft = false;
 
-    bool blinking = true;
+    bool blinking = false;
     bool blinkSpriteCurrent = false;
     uint32_t blinkingRate = 200;
     uint32_t blinkingDelay = 0;
