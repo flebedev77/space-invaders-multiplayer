@@ -14,6 +14,8 @@ namespace config
     constexpr int windowHeight = 500;
 
     SDL_Rect cameraPos{0, 0, windowWidth, windowHeight};
+    SDL_Rect smoothCameraPos{0, 0, windowWidth, windowHeight};
+    float cameraSmoothness = 0.1f;
 
     Color backgroundColor{30.f, 30.f, 30.f};
 
@@ -52,6 +54,8 @@ namespace config
     uint32_t deltaTime = 0;
 
     uint32_t shootRate = 500; // 70ms
+
+    uint32_t frameIndex = 0;
 
     int menuScreenColorIndex = 0;
     uint32_t menuScreenColorChangeDelay = 0;

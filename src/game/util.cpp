@@ -2,6 +2,14 @@
 
 namespace utils
 {
+    uint32_t cameraShakeDelay = 0;
+    uint32_t cameraShakeRate = 40;
+
+    bool cameraShakeRunning = false;
+    int iIterations = 10;
+    int iterations = iIterations;
+    int intensity = 2;
+
     bool aabb(SDL_FRect *a, SDL_FRect *b)
     {
         return (
@@ -52,17 +60,28 @@ namespace utils
         return text;
     }
 
+    int randomInt(uint32_t& seed)
+    {
+        srand(seed);
+        seed = rand();
+        return (int)seed;
+    }
 
-    void cameraShake(SDL_Rect& camera, int _iterations, int _intensity)
+    int posOrNegRand(uint32_t& seed)
+    {
+        return (randomInt(seed) % 2 == 0) ? -1 : 1;
+    }
+
+    void cameraShake(SDL_Rect &camera, int _iterations, int _intensity)
     {
         cameraShakeRunning = true;
         cameraShakeDelay = 0;
-        utils::iterations = _iterations;
-        utils::intensity = _intensity;
+        iterations = iIterations;
+        intensity = _intensity;
     }
-    void cameraUpdate(SDL_Rect& camera, uint32_t deltaTime)
+    void cameraUpdate(SDL_Renderer *renderer, SDL_Rect& smoothCamera, SDL_Rect &camera, uint32_t deltaTime, uint32_t frameIndex, float cameraSmoothness)
     {
-        if (!cameraShakeRunning)
+        if (cameraShakeRunning)
         {
             cameraShakeDelay += deltaTime;
             if (cameraShakeDelay > cameraShakeRate)
@@ -71,23 +90,25 @@ namespace utils
                 if (iterations <= 0)
                 {
                     cameraShakeRunning = false;
-                    iterations = 5;
+                    iterations = iIterations;
                 }
                 iterations--;
 
-                long seed = time(0) + deltaTime * 100 + iterations; 
-                srand(seed);
-                int xneg = (rand() % 3) - 1;
-                srand(seed+1);
-                int xmove = (rand() % intensity) * xneg;
+                uint32_t seed = time(0) + deltaTime * 100 + iterations * frameIndex;
+                int xmove = (randomInt(seed) % intensity) * posOrNegRand(seed);
+                int ymove = (randomInt(seed) % intensity) * posOrNegRand(seed);
 
-                camera.x += xmove;
+                camera.x = xmove;
+                camera.y = ymove;
             }
         }
-        else 
+        else
         {
             camera.x = 0;
             camera.y = 0;
         }
+
+        smoothCamera.x = (int)lerp((float)smoothCamera.x, (float)camera.x, cameraSmoothness);
+        smoothCamera.y = (int)lerp((float)smoothCamera.y, (float)camera.y, cameraSmoothness);
     }
 }

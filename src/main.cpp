@@ -214,6 +214,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     SDL_SetRenderDrawColor(renderer, config::backgroundColor.r, config::backgroundColor.g, config::backgroundColor.b, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
 
+    config::frameIndex++;
+
+    utils::cameraUpdate(renderer, config::smoothCameraPos, config::cameraPos, config::deltaTime, config::frameIndex, config::cameraSmoothness);
+    SDL_SetRenderViewport(renderer, &config::smoothCameraPos);
+
+
     for (size_t i = 0; i < config::stars_amt; i++)
     {
         Particle &p = config::stars[i];
@@ -358,6 +364,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 {
                     b.health -= config::bulletDamage;
                     SpawnParticles(b.position.x, b.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
+                    utils::cameraShake(config::cameraPos);
                     a.bullets.erase(a.bullets.begin() + bulletIndex);
                     b.hit = true;
                 }
@@ -377,6 +384,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     a.health -= config::bulletDamage;
                     a.hit = true;
                     SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
+                    utils::cameraShake(config::cameraPos);
+
                     b.bullets.erase(b.bullets.begin() + bulletIndex);
                 }
                 for (size_t aBulletIndex = 0; aBulletIndex < a.bullets.size(); aBulletIndex++)
