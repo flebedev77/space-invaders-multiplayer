@@ -12,6 +12,7 @@
 #include "game/util.h"
 #include "game/config.h"
 #include "game/controls.h"
+#include "logo.h"
 
 struct AppContext
 {
@@ -98,6 +99,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+
+    SDL_SetWindowIcon(window, utils::loadEmbeddedBMP(renderer, logo_bmp, logo_bmp_len));
 
     // print some information about the window
     SDL_ShowWindow(window);
