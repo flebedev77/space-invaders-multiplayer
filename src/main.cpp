@@ -222,7 +222,6 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     utils::cameraUpdate(renderer, config::smoothCameraPos, config::cameraPos, config::deltaTime, config::frameIndex, config::cameraSmoothness);
     SDL_SetRenderViewport(renderer, &config::smoothCameraPos);
 
-
     for (size_t i = 0; i < config::stars_amt; i++)
     {
         Particle &p = config::stars[i];
@@ -264,16 +263,20 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     }
 
     // global particles
-    for (size_t i = 0; i < config::global_particles.size(); i++)
+    if (config::global_particles.size() > 0)
     {
-        Particle &particle = config::global_particles.at(i);
-        particle.Draw(renderer);
-        particle.Update(config::deltaTime);
-
-        particle.lifetime += config::deltaTime;
-        if (particle.lifetime > particle.maxLifetime)
+        for (auto it = config::global_particles.rbegin(); it != config::global_particles.rend(); ++it)
         {
-            config::global_particles.erase(config::global_particles.begin() + i);
+            Particle &particle = *it;
+            particle.Draw(renderer);
+            particle.Update(config::deltaTime);
+
+            particle.lifetime += config::deltaTime;
+            if (particle.lifetime > particle.maxLifetime)
+            {
+                //config::global_particles.erase(config::global_particles.begin() + i);
+                config::global_particles.erase((it + 1).base());
+            }
         }
     }
 
@@ -281,9 +284,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
     for (size_t playerIndex = 0; playerIndex < config::playerAmt; playerIndex++)
     {
         Player &player = config::players[playerIndex];
-        for (size_t i = 0; i < player.bullets.size(); i++)
+        for (auto bulletIter = player.bullets.rbegin(); bulletIter != player.bullets.rend(); ++bulletIter)
         {
-            Bullet &bullet = player.bullets.at(i);
+            Bullet &bullet = *bulletIter;
 
             bullet.Update(config::deltaTime);
             bullet.Draw(renderer);
@@ -297,9 +300,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     bullet.position.y,
                     bullet.width,
                     bullet.height};
-                for (size_t blockIndex = 0; blockIndex < config::blocks.size(); blockIndex++)
+                for (auto blockIter = config::blocks.rbegin(); blockIter != config::blocks.rend(); ++blockIter)
                 {
-                    Block &block = config::blocks.at(blockIndex);
+                    Block &block = *blockIter;
                     SDL_FRect blockRect{
                         block.position.x,
                         block.position.y,
@@ -313,7 +316,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                         SpawnParticles(block.position.x, block.position.y, 5, 0.5f, 0.5f, 1.f);
                         if (block.health <= 0)
                         {
-                            config::blocks.erase(config::blocks.begin() + blockIndex);
+                            config::blocks.erase((blockIter + 1).base());
                         }
                         break;
                     }
@@ -322,7 +325,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
 
             if (willDie)
             {
-                player.bullets.erase(player.bullets.begin() + i);
+                player.bullets.erase((bulletIter + 1).base());
             }
         }
     }
@@ -373,9 +376,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 }
             }
 
-            for (size_t bulletIndex = 0; bulletIndex < b.bullets.size(); bulletIndex++)
+            for (auto bBulletIter = b.bullets.rbegin(); bBulletIter != b.bullets.rend(); ++bBulletIter)
             {
-                Bullet &bullet = b.bullets.at(bulletIndex);
+                Bullet &bullet = *bBulletIter;
                 SDL_FRect bullet_rect{
                     bullet.position.x,
                     bullet.position.y,
@@ -389,11 +392,11 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
 
-                    b.bullets.erase(b.bullets.begin() + bulletIndex);
+                    b.bullets.erase((bBulletIter+1).base());
                 }
-                for (size_t aBulletIndex = 0; aBulletIndex < a.bullets.size(); aBulletIndex++)
+                for (auto aBulletIter = a.bullets.rbegin(); aBulletIter != a.bullets.rend(); ++aBulletIter)
                 {
-                    Bullet &aBullet = a.bullets.at(aBulletIndex);
+                    Bullet &aBullet = *aBulletIter;
 
                     SDL_FRect a_bullet_rect{
                         aBullet.position.x,
@@ -404,8 +407,8 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     if (utils::aabb(&bullet_rect, &a_bullet_rect))
                     {
                         SpawnParticles(bullet.position.x, bullet.position.y, 15, 0.9f, 0.8f, 0.1f);
-                        b.bullets.erase(b.bullets.begin() + bulletIndex);
-                        a.bullets.erase(a.bullets.begin() + aBulletIndex);
+                        b.bullets.erase((bBulletIter+1).base());
+                        a.bullets.erase((aBulletIter+1).base());
                     }
                 }
             }

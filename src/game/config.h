@@ -44,8 +44,8 @@ namespace config
 
     bool hasStarted = false;
     bool isGameOver = false;
-    uint gameOverRestartDelay = 0;
-    uint gameOverRestartRate = 2000;
+    uint32_t gameOverRestartDelay = 0;
+    uint32_t gameOverRestartRate = 2000;
     uint8_t gameOverPlayerIndex = 0;
 
     uint16_t displayDigitAmt = 4;
