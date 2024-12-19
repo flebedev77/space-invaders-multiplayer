@@ -7,6 +7,7 @@
 #include <string>
 #include <cstring>
 #include "game/images.h"
+#include "game/audio.h"
 #include "game/player.h"
 #include "game/block.h"
 #include "game/util.h"
@@ -20,6 +21,8 @@ struct AppContext
     SDL_Renderer *renderer;
     SDL_AppResult app_quit = SDL_APP_CONTINUE;
 };
+
+static SDL_AudioStream *stream = NULL;
 
 void SpawnParticles(float x, float y, int amt, float r, float g, float b, float spd = 0.1f);
 
@@ -80,7 +83,7 @@ SDL_AppResult SDL_Fail()
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
     // init the library, here we make a window so we only need the Video capabilities.
-    if (not SDL_Init(SDL_INIT_VIDEO))
+    if (not SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
         return SDL_Fail();
     }
@@ -97,6 +100,18 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     {
         return SDL_Fail();
     }
+
+    audio::LoadAudios();
+    SDL_AudioSpec spec = audio::hitSound.spec;
+
+    stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+    if (!stream)
+    {
+        SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+
+    SDL_ResumeAudioStreamDevice(stream);
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
@@ -119,8 +134,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     // set up the application data
     *appstate = new AppContext{
         window,
-        renderer,
-    };
+        renderer};
 
     SDL_Log("Application started successfully!");
 
@@ -274,7 +288,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
             particle.lifetime += config::deltaTime;
             if (particle.lifetime > particle.maxLifetime)
             {
-                //config::global_particles.erase(config::global_particles.begin() + i);
+                // config::global_particles.erase(config::global_particles.begin() + i);
                 config::global_particles.erase((it + 1).base());
             }
         }
@@ -369,6 +383,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&b_rect, &bullet_rect))
                 {
                     b.health -= config::bulletDamage;
+                    audio::PlaySound(audio::hitSound, stream);
                     SpawnParticles(b.position.x, b.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
                     a.bullets.erase(a.bullets.begin() + bulletIndex);
@@ -388,11 +403,12 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&a_rect, &bullet_rect))
                 {
                     a.health -= config::bulletDamage;
+                    audio::PlaySound(audio::hitSound, stream);
                     a.hit = true;
                     SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
 
-                    b.bullets.erase((bBulletIter+1).base());
+                    b.bullets.erase((bBulletIter + 1).base());
                 }
                 for (auto aBulletIter = a.bullets.rbegin(); aBulletIter != a.bullets.rend(); ++aBulletIter)
                 {
@@ -407,8 +423,9 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     if (utils::aabb(&bullet_rect, &a_bullet_rect))
                     {
                         SpawnParticles(bullet.position.x, bullet.position.y, 15, 0.9f, 0.8f, 0.1f);
-                        b.bullets.erase((bBulletIter+1).base());
-                        a.bullets.erase((aBulletIter+1).base());
+                        utils::cameraShake(config::cameraPos);
+                        b.bullets.erase((bBulletIter + 1).base());
+                        a.bullets.erase((aBulletIter + 1).base());
                     }
                 }
             }
