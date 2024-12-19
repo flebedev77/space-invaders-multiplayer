@@ -8,13 +8,25 @@ namespace audio
         uint8_t *buffer;
         uint32_t bufferLength;
         SDL_AudioSpec spec;
+        SDL_AudioStream *stream = nullptr;
     };
 
-    extern AudioData hitSound;
+    enum Sound
+    {
+        hitSound,
+        zapSound,
+        thudSound,
+        shootSound
+    };
+
+    extern AudioData sounds[4];
+
     extern AudioData currentData;
 
-    AudioData *LoadWAVFromMemory(unsigned char wav_data[], unsigned int wav_data_len);
+    extern SDL_AudioDeviceID device;
+
+    AudioData LoadWAVFromMemory(unsigned char wav_data[], unsigned int wav_data_len);
     void LoadAudios();
 
-    void PlaySound(AudioData& data, SDL_AudioStream* stream);
+    void PlaySound(AudioData &data);
 };

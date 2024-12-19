@@ -22,7 +22,6 @@ struct AppContext
     SDL_AppResult app_quit = SDL_APP_CONTINUE;
 };
 
-static SDL_AudioStream *stream = NULL;
 
 void SpawnParticles(float x, float y, int amt, float r, float g, float b, float spd = 0.1f);
 
@@ -102,16 +101,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     }
 
     audio::LoadAudios();
-    SDL_AudioSpec spec = audio::hitSound.spec;
-
-    stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
-    if (!stream)
-    {
-        SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
-        return SDL_APP_FAILURE;
-    }
-
-    SDL_ResumeAudioStreamDevice(stream);
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
@@ -263,6 +252,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         {
             config::players[i].shootDelay = 0;
             config::players[i].Shoot();
+            audio::PlaySound(audio::sounds[audio::Sound::shootSound]);
         }
 
         Player &player = config::players[i];
@@ -327,6 +317,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     {
                         willDie = true;
                         block.health -= config::bulletDamage;
+                        audio::PlaySound(audio::sounds[audio::Sound::zapSound]);
                         SpawnParticles(block.position.x, block.position.y, 5, 0.5f, 0.5f, 1.f);
                         if (block.health <= 0)
                         {
@@ -383,7 +374,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&b_rect, &bullet_rect))
                 {
                     b.health -= config::bulletDamage;
-                    audio::PlaySound(audio::hitSound, stream);
+                    audio::PlaySound(audio::sounds[audio::Sound::hitSound]);
                     SpawnParticles(b.position.x, b.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
                     a.bullets.erase(a.bullets.begin() + bulletIndex);
@@ -403,7 +394,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&a_rect, &bullet_rect))
                 {
                     a.health -= config::bulletDamage;
-                    audio::PlaySound(audio::hitSound, stream);
+                    audio::PlaySound(audio::sounds[audio::Sound::hitSound]);
                     a.hit = true;
                     SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
@@ -424,6 +415,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     {
                         SpawnParticles(bullet.position.x, bullet.position.y, 15, 0.9f, 0.8f, 0.1f);
                         utils::cameraShake(config::cameraPos);
+                        audio::PlaySound(audio::sounds[audio::Sound::thudSound]);
                         b.bullets.erase((bBulletIter + 1).base());
                         a.bullets.erase((aBulletIter + 1).base());
                     }
