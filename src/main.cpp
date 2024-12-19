@@ -252,7 +252,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
         {
             config::players[i].shootDelay = 0;
             config::players[i].Shoot();
-            audio::PlaySound(audio::sounds[audio::Sound::shootSound]);
+            audio::PlaySound(audio::Sound::shootSound);
         }
 
         Player &player = config::players[i];
@@ -317,7 +317,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     {
                         willDie = true;
                         block.health -= config::bulletDamage;
-                        audio::PlaySound(audio::sounds[audio::Sound::zapSound]);
+                        audio::PlaySound(audio::Sound::zapSound);
                         SpawnParticles(block.position.x, block.position.y, 5, 0.5f, 0.5f, 1.f);
                         if (block.health <= 0)
                         {
@@ -374,7 +374,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&b_rect, &bullet_rect))
                 {
                     b.health -= config::bulletDamage;
-                    audio::PlaySound(audio::sounds[audio::Sound::hitSound]);
+                    audio::PlaySound(audio::Sound::hitSound);
                     SpawnParticles(b.position.x, b.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
                     a.bullets.erase(a.bullets.begin() + bulletIndex);
@@ -394,7 +394,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                 if (utils::aabb(&a_rect, &bullet_rect))
                 {
                     a.health -= config::bulletDamage;
-                    audio::PlaySound(audio::sounds[audio::Sound::hitSound]);
+                    audio::PlaySound(audio::Sound::hitSound);
                     a.hit = true;
                     SpawnParticles(a.position.x, a.position.y, 25, 1.f, 1.f, 1.f, 0.5f);
                     utils::cameraShake(config::cameraPos);
@@ -415,7 +415,7 @@ SDL_AppResult SDL_AppIterate(void *appstate)
                     {
                         SpawnParticles(bullet.position.x, bullet.position.y, 15, 0.9f, 0.8f, 0.1f);
                         utils::cameraShake(config::cameraPos);
-                        audio::PlaySound(audio::sounds[audio::Sound::thudSound]);
+                        audio::PlaySound(audio::Sound::thudSound);
                         b.bullets.erase((bBulletIter + 1).base());
                         a.bullets.erase((aBulletIter + 1).base());
                     }

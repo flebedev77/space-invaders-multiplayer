@@ -26,18 +26,22 @@ namespace audio
             SDL_LogError(SDL_LOG_PRIORITY_ERROR, "Falied loading wav!");
         }
 
+        
 
-        d.stream = SDL_CreateAudioStream(&d.spec, NULL);
-        if (!d.stream)
+        return d;
+    }
+
+    void createStream(SDL_AudioStream *stream, SDL_AudioSpec* spec)
+    {
+        stream = SDL_CreateAudioStream(spec, NULL);
+        if (!stream)
         {
             SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
         }
-        else if (!SDL_BindAudioStream(device, d.stream))
-        { /* once bound, it'll start playing when there is data available! */
+        else if (!SDL_BindAudioStream(device, stream))
+        { 
             SDL_Log("Failed to bind stream to device: %s", SDL_GetError());
         }
-
-        return d;
     }
 
     void LoadAudios()
@@ -52,13 +56,38 @@ namespace audio
         sounds[Sound::zapSound] = LoadWAVFromMemory(zap_wav, zap_wav_len);
         sounds[Sound::thudSound] = LoadWAVFromMemory(thud_wav, thud_wav_len);
         sounds[Sound::shootSound] = LoadWAVFromMemory(shoot_wav, shoot_wav_len);
+
+        for(size_t i = 0; i < streamAmt; i++)
+        {
+            createStream(streams[i], &sounds[0].spec);
+        }
     }
 
-    void PlaySound(AudioData &data)
+    SDL_AudioStream* findEmptyStream(SDL_AudioSpec* spec)
     {
-        if (data.stream != nullptr)
+        int lowestStreamData = SDL_MAX_SINT32;
+        SDL_AudioStream* lowestStream = nullptr;
+        for(size_t i = 0; i < streamAmt; i++)
         {
-            SDL_PutAudioStreamData(data.stream, data.buffer, data.bufferLength);
+            SDL_AudioStream* stream = streams[i];
+
+            int streamData = SDL_GetAudioStreamAvailable(stream);
+            if (streamData < lowestStreamData)
+            {
+                lowestStreamData = streamData;
+                lowestStream = stream;
+            }
+        }
+        return lowestStream;
+    }
+
+    void PlaySound(uint32_t soundId)
+    {
+        AudioData& data = sounds[soundId];
+        SDL_AudioStream* stream = findEmptyStream(&data.spec);
+        if (stream != nullptr)
+        {
+            SDL_PutAudioStreamData(stream, data.buffer, data.bufferLength);
         }
     }
 }
